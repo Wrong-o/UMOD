@@ -1,15 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple UI</title>
-</head>
-<body>
-    <input type="text" id="userInput" placeholder="Type here">
-    <button onclick="sendRequest()">Submit</button>
-    <p id="responseText"></p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Modern Search UI</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f7f7f7;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                flex-direction: column;
+            }
+    
+            .search-container {
+                position: relative;
+                width: 100%;
+                max-width: 400px;
+                margin-top: 40px;
+            }
+    
+            .search-box {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 16px;
+                border-radius: 25px;
+                border: 2px solid #ccc;
+                outline: none;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease-in-out;
+            }
+    
+            .search-box:focus {
+                border-color: #4CAF50;
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+            }
+    
+            .search-button {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 25px;
+                padding: 12px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: all 0.3s ease-in-out;
+            }
+    
+            .search-button:hover {
+                background-color: #45a049;
+            }
+        </style>
+    </head>
+    
 
+<header>
+    <h1>UMOD</h1>
+</header>
+
+
+
+<body>
+ 
+    <div>
+        <input type="text" id="userInput" placeholder="Type here">
+        <button onclick="sendRequest()">Submit</button>
+    </div>
+
+    
+    <p id="responseText"></p>
+    
     <script>
         function sendRequest() {
             const text = document.getElementById('userInput').value;
@@ -25,5 +93,8 @@
             .catch(error => console.error('Error:', error));  // Log any errors
         }
     </script>
+
+
 </body>
-</html>
+
+
