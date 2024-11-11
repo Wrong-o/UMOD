@@ -19,6 +19,7 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
+
 def log_interaction(user_input, response):
     """Log user input and response to a text file."""
     with open(log_file, "a", encoding="utf-8") as file:
@@ -48,12 +49,12 @@ def api_call():
 
 @app.route('/airpods')
 def airpods():
-    return render_template('index.html', product_name="AirPods")
+    return render_template('index.html', title="AirPods")
 
 # Route for MacBook page
 @app.route('/macbook')
 def macbook():
-    return render_template('index.html', product_name="MacBook")
+    return render_template('index.html', title="MacBook")
 
 
 
