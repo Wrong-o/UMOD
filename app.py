@@ -25,6 +25,7 @@ def log_interaction(user_input, response):
         file.write(f"Response: {response}\n")
         file.write("="*50 + "\n")  # Separator for readability
 
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -42,6 +43,17 @@ def api_call():
     response = chat_completion.choices[0].message.content
     log_interaction(user_input, response)  # Log input and output
     return jsonify({"response": response})  # Wrap response in JSON
+
+@app.route('/airpods')
+def airpods():
+    return render_template('index.html', product_name="AirPods")
+
+# Route for MacBook page
+@app.route('/macbook')
+def macbook():
+    return render_template('index.html', product_name="MacBook")
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

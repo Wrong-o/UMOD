@@ -5,66 +5,301 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Search UI</title>
     <style>
-        body {
+          body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f7f7f7;
+            background-color: #f5f5f5;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             flex-direction: column;
+            height: 100vh;
+            color: #333;
         }
-        .search-container {
-        position: relative;
-        width: 100%;
-        max-width: 400px;
-        margin-top: 40px;
-    }
 
-    .search-box {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 16px;
-        border-radius: 25px;
-        border: 2px solid #ccc;
-        outline: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease-in-out;
-    }
+        header {
+            width: 100%;
+            padding: 20px;
+            background-color: #2b2f3a;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
 
-    .search-box:focus {
-        border-color: #4CAF50;
-        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
-    }
+        .chat-container {
+            flex: 1;
+            padding: 80px 20px 100px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
-    .search-button {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 12px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease-in-out;
-    }
+        /* Message wrapper for positioning */
+        .message-wrapper {
+            display: flex;
+            margin: 8px 0;
+            width: 100%;
+        }
 
-    .search-button:hover {
-        background-color: #45a049;
-    }
-</style>
+        .message-wrapper.user {
+            justify-content: flex-end;
+        }
 
+        /* Enhanced message bubbles */
+        .message {
+            padding: 12px 16px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        /* User message styling */
+        .user-message {
+            background-color: #2b2f3a;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .user-message::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            background-color: #2b2f3a;
+            clip-path: polygon(0 0, 0% 100%, 100% 100%);
+        }
+        .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 15px;
+    background-color: black;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.message {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+    max-width: 70%;
+}
+
+.bot-message {
+    background-color: #e0e0e0;
+    align-self: flex-start;
+}
+
+
+        /* Bot message styling */
+        .bot-message {
+            background-color: #e0e0e0;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .bot-message::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 16px;
+            height: 16px;
+            background-color: #e0e0e0;
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-box {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 25px;
+            padding: 5px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px;
+            font-size: 16px;
+            background: transparent;
+        }
+
+        .send-button {
+            background-color: #2b2f3a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .send-button:hover {
+            background-color: #3d4251;
+        }
+
+        /* Add message time stamps */
+        .message-time {
+            font-size: 12px;
+            margin-top: 4px;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        @media (max-width: 600px) {
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>UMOD</h1>
+        UMOD HANDBOOK
     </header>
 
+<<<<<<< HEAD
+    <div class="chat-container" id="chatContainer">
+        <!-- Messages will be added here dynamically -->
+    </div>
+
+    <div class="input-container">
+        <div class="input-box">
+            <input type="text" id="userInput" class="text-input" placeholder="What now blyat nakhuy..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Utility function to create delays
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Function to type out a message character by character for the bot
+        async function typeMessage(text) {
+            // Create message container for bot message
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot-message');
+            
+            
+            // Create a text span for the message and a cursor
+            const textElement = document.createElement('span');
+            const cursor = document.createElement('span');
+            cursor.classList.add('cursor');
+            cursor.textContent = '|';
+            
+            // Append both elements to the messageDiv
+            messageDiv.appendChild(textElement);
+            messageDiv.appendChild(cursor);
+
+            const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        messageDiv.appendChild(timeDiv);
+        
+            // Append the bot message div to the chat container
+            document.getElementById('chatContainer').appendChild(messageDiv);
+            scrollToBottom();
+        
+            // Type each character with a delay
+            const typingSpeed = 50; // milliseconds per character
+            for (let i = 0; i < text.length; i++) {
+                textElement.textContent += text[i];
+                await sleep(typingSpeed);
+                scrollToBottom(); // Ensure chat scrolls with new content
+            }
+
+        
+        
+            // Hide the cursor after typing
+            cursor.style.display = 'none';
+        }
+        
+        // Function to create user messages instantly
+        function createUserMessage(text) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('message-wrapper', 'user');
+        
+            const message = document.createElement('div');
+            message.classList.add('message', 'user-message');
+            message.textContent = text;
+        
+            wrapper.appendChild(message);
+            document.getElementById('chatContainer').appendChild(wrapper);
+            scrollToBottom();
+        }
+        
+        // Function to scroll chat container to the bottom
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Function to handle sending the message
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+        
+            if (text !== '') {
+                // Display user message
+                createUserMessage(text);
+                
+                // Clear input field
+                input.value = '';
+        
+                // Simulate bot typing response (you can replace this with an API call if needed)
+                const botResponse = "Thank you for your message!"; // Example bot response
+                typeMessage(botResponse);
+            }
+        }
+        
+        // Handle Enter key to send the message
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Add welcome message on page load
+        window.onload = function() {
+            typeMessage('Welcome! How can I help you today?');
+        }
+        </script>
+
+   
+
+=======
     <div id="responseContainer" style="margin-top: 20px;"></div>
 
     <div>
@@ -72,6 +307,7 @@
         <button class="search-button" onclick="sendRequest()">Submit</button>
     </div>
     
+>>>>>>> 03fb696abb55aa7c6020e6613efa3f042ca84b45
     
     <script>
         function sendRequest() {
