@@ -267,20 +267,27 @@
         
         // Function to handle sending the message
         function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-        
-            if (text !== '') {
-                // Display user message
-                createUserMessage(text);
-                
-                // Clear input field
-                input.value = '';
-        
-                // Simulate bot typing response (you can replace this with an API call if needed)
-                const botResponse = "Thank you for your message!"; // Example bot response
-                typeMessage(botResponse);
-            }
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+
+        if (text !== '') {
+            createUserMessage(text); // Show user message in chat
+            input.value = '';
+
+            // Send to API
+            fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                typeMessage(data.response); // Display API response
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
         }
         
         // Handle Enter key to send the message
