@@ -185,7 +185,7 @@
 </head>
 <body>
     <header>
-        UMOD HANDBOOK
+        <title>{{ title }}</title> <!-- Set the page title dynamically -->
     </header>
 
     <div class="chat-container" id="chatContainer">
@@ -232,10 +232,10 @@
             scrollToBottom();
         
             // Type each character with a delay
-            const typingSpeed = 50; // milliseconds per character
+            const typingSpeed = 10; // milliseconds per character
             for (let i = 0; i < text.length; i++) {
                 textElement.textContent += text[i];
-                await sleep(typingSpeed);
+                await sleep(typingSpeed); 
                 scrollToBottom(); // Ensure chat scrolls with new content
             }
 

@@ -10,3 +10,32 @@ Timestamp: 2024-11-11 22:44:22.089751
 User Input: How do i charge airpods?
 Response: AirPods can be charged by placing them in their charging case. The case itself can be charged wirelessly by placing it on a Qi-certified charger or by using the Lightning connector to plug it into a power source. Simply place the AirPods in the case and make sure the status light is facing up when placing it on a wireless charger. If using the Lightning connector, plug it in to charge.
 ==================================================
+Timestamp: 2024-11-12 00:19:40.175856
+User Input: how do i clean my airpods
+Response: To clean your AirPods, follow these steps:
+
+1. Use a soft, dry, lint-free cloth to wipe down the exterior of your AirPods and the charging case. Avoid using any liquids or abrasive materials.
+
+2. For any dirt or debris in the speaker mesh, gently brush it away with a soft-bristled brush, such as a clean toothbrush.
+
+3. If there is wax buildup in the speaker mesh, you can dampen a lint-free cloth with warm water and gently wipe the mesh. Be careful not to get any liquid inside the AirPods.
+
+4. For the AirPods Pro with silicone ear tips, remove the ear tips and rinse them with water. Make sure they are completely dry before reattaching them.
+
+5. You can use a soft, slightly damp cloth to clean the inside of the charging case.
+
+6. To clean the Lightning connector on the bottom of the case, use a dry cotton swab or a soft-bristled brush to remove any debris.
+
+For more information on cleaning your AirPods or if you encounter any issues, you can visit apple.com/support.
+==================================================
+Timestamp: 2024-11-12 00:22:44.638567
+User Input: how do i clean
+Response: To clean your AirPods Pro, follow these steps:
+
+1. Remove any debris from the speaker mesh using a clean, soft-bristled brush.
+2. Use a slightly damp cloth to gently wipe the exterior of the AirPods Pro and the case.
+3. Do not use any liquids directly on the AirPods Pro or the case.
+4. Ensure that the AirPods Pro and the case are completely dry before placing them back in the charging case.
+
+For more detailed cleaning instructions and tips, you can visit apple.com/support. If you encounter any issues or need further assistance, feel free to reach out to Apple Support.
+==================================================

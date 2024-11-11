@@ -13,6 +13,8 @@ log_file = "interaction_log.txt"
 with open(file_path, "r", encoding="utf-8") as file:
     airpods_content = file.read()
 
+
+
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
