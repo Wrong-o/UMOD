@@ -64,12 +64,14 @@
     <header>
         <h1>UMOD</h1>
     </header>
+
+    <div id="responseContainer" style="margin-top: 20px;"></div>
+
     <div>
-        <input type="text" id="userInput" placeholder="Type here">
-        <button onclick="sendRequest()">Submit</button>
+        <input class="search-box" type="text" id="userInput" placeholder="Type here">
+        <button class="search-button" onclick="sendRequest()">Submit</button>
     </div>
     
-    <div id="responseContainer" style="margin-top: 20px;"></div>
     
     <script>
         function sendRequest() {

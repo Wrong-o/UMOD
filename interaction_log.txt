@@ -1,0 +1,12 @@
+Timestamp: 2024-11-11 22:42:04.178002
+User Input: This is a test
+Response: Thank you for the test. If you have any more questions or need assistance, feel free to ask!
+==================================================
+Timestamp: 2024-11-11 22:42:32.583156
+User Input: Kan jag tvätta mina aripods i rinnande vatten
+Response: Nej, det rekommenderas inte att tvätta dina AirPods i rinnande vatten. Om dina AirPods behöver rengöras, använd en mjuk trasa som är fri från ludd och eventuellt lite vatten för att torka av dem. Se till att AirPods är avstängda innan du börjar rengöringsprocessen. Undvik att blötlägga dem eller utsätta dem för överdriven fukt, eftersom detta kan skada enheten. För mer detaljerad information om rengöring av dina AirPods, var god kolla på Apple:s supportsida.
+==================================================
+Timestamp: 2024-11-11 22:44:22.089751
+User Input: How do i charge airpods?
+Response: AirPods can be charged by placing them in their charging case. The case itself can be charged wirelessly by placing it on a Qi-certified charger or by using the Lightning connector to plug it into a power source. Simply place the AirPods in the case and make sure the status light is facing up when placing it on a wireless charger. If using the Lightning connector, plug it in to charge.
+==================================================
