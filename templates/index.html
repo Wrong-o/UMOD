@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple UI</title>
+</head>
+<body>
+    <input type="text" id="userInput" placeholder="Type here">
+    <button onclick="sendRequest()">Submit</button>
+    <p id="responseText"></p>
+
+    <script>
+        function sendRequest() {
+            const text = document.getElementById('userInput').value;
+            fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('responseText').innerText = data.response;  // Display response
+            })
+            .catch(error => console.error('Error:', error));  // Log any errors
+        }
+    </script>
+</body>
+</html>
