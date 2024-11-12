@@ -1,50 +1,42 @@
 import psycopg2
+from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
+import os
 
-class DataBaseManager:
-    def __init__(self, host, port, database, user, password):
-        self.conn = psycopg2.connect(
-            host=host,
-            port=port,
-            database=database,
-            user=user,
-            password=password
-        )
-        self.cursor = self.conn.cursor()
+class DatabaseManager:
+    def __init__(self):
+        load_dotenv()
+        self.db_config = {
+            'host': os.environ.get("DB_ENDPOINT"),
+            'dbname': os.environ.get("DB_NAME"),
+            'user': os.environ.get("DB_USERNAME"),
+            'password': os.environ.get("DB_PASSWORD"),
+            'port': os.environ.get("DB_PORT")
+        }
+        self.connection = None
 
-    def create_table(self, table_name, columns):
-        """
-        Creates a new table in the database.
-        
-        Parameters:
-        table_name (str): Name of the table to create.
-        columns (dict): Dictionary where keys are column names and values are column data types.
-        """
-        column_def = ", ".join([f"{name} {data_type}" for name, data_type in columns.items()])
-        self.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({column_def})")
-        self.conn.commit()
+    def connect(self):
+        """Establish a database connection."""
+        try:
+            self.connection = psycopg2.connect(**self.db_config)
+        except Exception as e:
+            print(f"Error connecting to database: {e}")
+            self.connection = None
 
-    def get_all_data(self, table_name):
-        """
-        Retrieves all data from a table.
-        
-        Parameters:
-        table_name (str): Name of the table to retrieve data from.
-        
-        Returns:
-        list: List of tuples, where each tuple represents a row of data.
-        """
-        self.cursor.execute(f"SELECT * FROM {table_name}")
-        return self.cursor.fetchall()
+    def close(self):
+        """Close the database connection."""
+        if self.connection:
+            self.connection.close()
 
-    def append_data(self, table_name, data):
-        """
-        Appends data to a table.
-        
-        Parameters:
-        table_name (str): Name of the table to append data to.
-        data (dict): Dictionary where keys are column names and values are the data to insert.
-        """
-        columns = ", ".join(data.keys())
-        values = ", ".join(["%s" for _ in data])
-        self.cursor.execute(f"INSERT INTO {table_name} ({columns}) VALUES ({values})", tuple(data.values()))
-        self.conn.commit()
+    def fetch_data(self, query, params=None):
+        """Fetch data from the database and return as a single string."""
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, params)
+            result = cursor.fetchall()
+        return str(result)
+
+    def write_data(self, query, params=None):
+        """Write data to the database."""
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, params)
+            self.connection.commit()
