@@ -111,6 +111,8 @@
             background-color: #e0e0e0;
             color: #333;
             border-bottom-left-radius: 4px;
+            white-space: pre-line;
+            line-height: 1.5;
         }
 
         .bot-message::after {
@@ -199,50 +201,53 @@
     </div>
 
     <script>
-        // Utility function to create delays
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        
-        // Function to type out a message character by character for the bot
         async function typeMessage(text) {
-            // Create message container for bot message
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', 'bot-message');
-            
-            
-            // Create a text span for the message and a cursor
-            const textElement = document.createElement('span');
-            const cursor = document.createElement('span');
-            cursor.classList.add('cursor');
-            cursor.textContent = '|';
-            
-            // Append both elements to the messageDiv
-            messageDiv.appendChild(textElement);
-            messageDiv.appendChild(cursor);
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'bot-message');
 
-            const timeDiv = document.createElement('div');
-        timeDiv.classList.add('message-time');
-        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        messageDiv.appendChild(timeDiv);
-        
-            // Append the bot message div to the chat container
-            document.getElementById('chatContainer').appendChild(messageDiv);
-            scrollToBottom();
-        
-            // Type each character with a delay
-            const typingSpeed = 10; // milliseconds per character
-            for (let i = 0; i < text.length; i++) {
-                textElement.textContent += text[i];
-                await sleep(typingSpeed); 
-                scrollToBottom(); // Ensure chat scrolls with new content
-            }
+    const textElement = document.createElement('div'); // Changed to div for better line break handling
+    textElement.style.whiteSpace = 'pre-line'; // This will respect line breaks
+    const cursor = document.createElement('span');
+    cursor.classList.add('cursor');
+    cursor.textContent = '|';
 
-        
-        
-            // Hide the cursor after typing
-            cursor.style.display = 'none';
+    messageDiv.appendChild(textElement);
+    messageDiv.appendChild(cursor);
+
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('message-time');
+    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageDiv.appendChild(timeDiv);
+
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.appendChild(messageDiv);
+    scrollToBottom();
+
+    // Split the text into an array based on numbered points
+    const parts = text.split(/(?=\d+\.)/);
+    let formattedText = '';
+    
+    // Add line breaks between numbered points
+    parts.forEach((part, index) => {
+        if (index === 0 && !part.match(/^\d+\./)) {
+            formattedText += part.trim();
+        } else {
+            formattedText += '\n' + part.trim();
         }
+    });
+
+    const typingSpeed = 10;
+    let currentText = '';
+    for (let i = 0; i < formattedText.length; i++) {
+        currentText += formattedText[i];
+        textElement.textContent = currentText;
+        await sleep(typingSpeed);
+        scrollToBottom();
+    }
+
+    cursor.style.display = 'none';
+}
+        
         
         // Function to create user messages instantly
         function createUserMessage(text) {
