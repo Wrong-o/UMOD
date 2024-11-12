@@ -1,8 +1,8 @@
 import fitz  
 
 # Path to PDF and output text file
-pdf_path = "airpods2.pdf"
-txt_output_path = "airpods2.txt"
+pdf_path = "nordica.pdf"
+txt_output_path = "nordica.txt"
 
 # Open the PDF file
 with fitz.open(pdf_path) as pdf:
