@@ -164,3 +164,39 @@ Timestamp: 2024-11-12 01:34:44.577721
 User Input: Jävlar vad bred min fot är, men min ankel smal. vilka pjäxor ska jag ha
 Response: Det låter som att du har en specifik fotform med en bred framfot och en smal ankel. För att hitta rätt pjäxor för din fotform rekommenderas det att du besöker en auktoriserad återförsäljare eller butik som säljer Nordica pjäxor. Där kan de hjälpa dig att prova olika modeller och ge dig personlig rådgivning baserat på din unika fotanatomi.	             
 ==================================================
+Timestamp: 2024-11-12 01:36:15.843495
+User Input: backwheel squeaks at high speeds
+Response: It sounds like you may have an issue with your bike's wheel bearing, which can cause a squeaking noise at high speeds. Make sure to check the wheel bearings for any signs of wear, damage, or lack of lubrication. If you're unable to troubleshoot and fix the issue yourself, it would be a good idea to have a professional mechanic or Yamaha dealer inspect the wheel bearings for you. If you have any other questions, feel free to ask!
+==================================================
+Timestamp: 2024-11-12 15:31:05.151677
+User Input: what is the price of Nordica cockmaster?
+Response: None
+==================================================
+Timestamp: 2024-11-12 15:31:53.725780
+User Input: what is the price of Nordica cockmaster?
+Response: I'm not sure about the "Nordica cockmaster" product. Could you please provide more details or clarify your question?
+==================================================
+Timestamp: 2024-11-12 15:32:25.591643
+User Input: Jag har en bred fot men smal ankel, vilken pjäxa ska jag ha och vad kostar den?
+Response: För en bred fot men smal ankel rekommenderar jag Nordica Cockmaster pjäxor. Jag kan hjälpa dig att få information om priset på dem. Vill du ha priset för Nordica Cockmaster pjäxor?
+==================================================
+Timestamp: 2024-11-12 15:32:49.247227
+User Input: Ja, jag vill ha priset för Nordica cockmaster pjäxor
+Response: Could you please provide more information about the Nordica cockmaster ski boots you are referring to? This will help me provide you with the accurate price information.
+==================================================
+Timestamp: 2024-11-12 15:37:51.660147
+User Input: What is the price of nordica cockmaster?
+Response: I'm unable to provide real-time information on specific product prices. However, I can help you find the price of the Nordica Cockmaster ski boots. Would you like me to search for the price of this product for you?
+==================================================
+Timestamp: 2024-11-12 15:38:35.383133
+User Input: what is the price of Nordica cockmaster?
+Response: Could you please clarify your question? It seems like you might be referring to a product name that is not mentioned in the manual provided. Are you asking about Nordica ski boots or something specific related to them?
+==================================================
+Timestamp: 2024-11-12 15:38:54.839724
+User Input: what is the price of The skii bootNordica cockmaster?
+Response: Could you please clarify what you're looking for regarding the "Nordica cockmaster"? It appears that there might be a typo or misunderstanding, as I can't find any information on a Nordica ski boot with that name. Please provide more details or check the name again.
+==================================================
+Timestamp: 2024-11-12 15:42:40.811550
+User Input: What is the price of a nordica cockmaster?
+Response: None
+==================================================

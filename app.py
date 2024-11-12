@@ -16,7 +16,18 @@ file_paths = {
     "nordica" : "nordica.txt"
 }
 
+link_tables = {
+    "airpods": "airpods.txt",
+    "macbook": "macbook.txt",
+    "yamahayzf1000": "yamaha_yzf1000.txt",
+    "nordica" : "nordica.txt"
+}
+
 log_file = "interaction_log.txt"  
+
+# Mock price table as a dictionary
+prices_table = nordica_table
+
 
 client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
@@ -37,6 +48,24 @@ def log_interaction(user_input, response):
         file.write(f"User Input: {user_input}\n")
         file.write(f"Response: {response}\n")
         file.write("="*50 + "\n")  # Separator for readability
+
+# Define the function to look up prices
+def get_price(product_name, prices_table):
+    # Check if product is in the table, return price
+    return prices_table.get(product_name, "Price not found")
+
+price_function = {
+    "name": "get_price",
+    "description": "Get the price of a product",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "product_name": {"type": "string", "description": "The name of the product"}
+        },
+        "required": ["product_name"]
+    }
+}
+
 
 @app.route('/')
 def home():
@@ -74,9 +103,12 @@ def api_call():
             {"role": "system", "content": file_content },
             {"role": "user", "content": user_input + "If question is not relevant to input, ask for clarification."},
         ],
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0613",
+        functions=[price_function],
+        function_call="auto"
     )
     response = chat_completion.choices[0].message.content
+    print(response)
     log_interaction(user_input, response)  # Log input and output
     return jsonify({"response": response})  # Wrap response in JSON
 
