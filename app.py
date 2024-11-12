@@ -83,13 +83,19 @@ def api_call():
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": file_content },
-            {"role": "user", "content": user_input + "If question is not relevant to input, ask for clarification."},
+            {"role": "user", "content": user_input + f"Regarding my {route_name}:"},
         ],
         functions=[price_function],
         function_call="auto"
     )
     response = chat_completion.choices[0].message.content
     print(response)
+
+
+    log_query = "INSERT INTO questionlog (product, question, response) VALUES (%s, %s, %s)"
+    params = (route_name, user_input, response)
+
+    db_manager.write_data(query=log_query, params=params)
     return jsonify({"response": response})  # Wrap response in JSON
 
 if __name__ == '__main__':
