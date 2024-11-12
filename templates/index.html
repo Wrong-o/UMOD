@@ -6,7 +6,7 @@
     <title>Chat Bot</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -18,8 +18,13 @@
             background-color: #f5f5f5;
             color: #333;
             min-height: 100vh;
+            position: relative;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            overflow: hidden;
         }
 
         header {
@@ -28,6 +33,7 @@
             padding: 15px 20px;
             text-align: center;
             height: 70px;
+            width: 100%;
             position: fixed;
             top: 0;
             left: 0;
@@ -88,56 +94,37 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
-            }
-            
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
-            }
-            
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-            }
+        main {
+            margin-top: 70px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
-
-    
 
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            padding-top: 90px;
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 10px;
             width: 100%;
-            padding-bottom: 90px;
+            max-height: 70vh;
+            box-sizing: border-box;
+            overflow-y: scroll; /* Gör det möjligt att scrolla vertikalt */
+            scrollbar-width: none; /* Döljer scrollbar på Firefox */
+            
         }
-
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            margin-top: 0; /* Ta bort margin-top här eftersom vi använder padding i chat-container istället */
-            height: 100vh;
-        }
-
-
 
         .input-container {
+            width: 100%;
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #f5f5f5;
-            padding: 20px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            z-index: 98;
         }
 
         .input-box {
@@ -147,8 +134,14 @@
             align-items: center;
             background-color: white;
             border-radius: 25px;
-            padding: 5px 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 8px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .input-box:focus-within {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
 
         .text-input {
@@ -158,21 +151,24 @@
             padding: 12px;
             font-size: 16px;
             background: transparent;
+            font-family: 'Poppins', sans-serif;
         }
 
         .send-button {
-            background-color: #2b2f3a;
+            background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 20px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
 
         .send-button:hover {
-            background-color: #3d4251;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .message-wrapper {
@@ -186,109 +182,117 @@
         }
 
         .message {
-            padding: 12px 16px;
+            padding: 15px 20px;
             max-width: 70%;
             word-wrap: break-word;
             position: relative;
-            border-radius: 18px;
+            border-radius: 20px;
             font-size: 15px;
             line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
         .user-message {
-            background-color: #2b2f3a;
+            background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
             color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .user-message::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: -8px;
-            width: 16px;
-            height: 16px;
-            background-color: #2b2f3a;
-            clip-path: polygon(0 0, 0% 100%, 100% 100%);
+            border-bottom-right-radius: 5px;
         }
 
         .bot-message {
-            background-color: #e0e0e0;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
             color: #333;
-            border-bottom-left-radius: 4px;
-            white-space: pre-line;
-        }
-
-        .bot-message::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -8px;
-            width: 16px;
-            height: 16px;
-            background-color: #e0e0e0;
-            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            border-bottom-left-radius: 5px;
         }
 
         .message-time {
-            font-size: 12px;
-            margin-top: 4px;
+            font-size: 11px;
+            margin-top: 5px;
             opacity: 0.7;
             text-align: right;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 15px;
-            background-color: black;
-            margin-left: 2px;
-            animation: blink 1s infinite;
+        .umod-signature {
+            position: fixed;
+            bottom: 130px;
+            right: 20px;
+            font-size: 12px;
+            color: #666;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 97;
         }
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-
-        @media (max-width: 600px) {
-            .message {
-                max-width: 85%;
-            }
-        }
     </style>
 
 
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div class="Title text">
-                🤖
-            </div>
-            <div class="header-text">
-                <h1>Chat Bot</h1>
-                <div class="status">
-                    <span class="status-dot"></span>
-                    Online
-                </div>
+
+    <script>
+        // Function to get product name from URL and format it
+        function getProductNameFromUrl() {
+            const path = window.location.pathname;
+            const productName = path.split('/').pop(); // Get last part of URL
+            return productName
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/(\d+)/g, ' $1')
+                .split(/(?=[A-Z0-9])/)
+                .join(' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        // Combine both window.onload functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update header text
+            const productName = getProductNameFromUrl();
+            console.log("Product Name:", productName); // För debugging
+            const headerTitle = document.querySelector('.header-text h1');
+            if (headerTitle) {
+                headerTitle.textContent = productName;
+            } else {
+                console.error("Header title element not found");
+            }
+        });
+    </script>
+
+
+<header>
+    <div class="header-content">
+        <div class="bot-icon">
+            ⚙️
+        </div>
+        <div class="header-text">
+            <h1 id="productTitle">Loading...</h1>
+            <div class="status">
+                <span class="status-dot"></span>
+                Online
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
+<main>
     <div class="chat-container" id="chatContainer">
         <!-- Messages will be added here dynamically -->
-
     </div>
 
-
-    <main>
-        <div class="chat-container" id="chatContainer">
-            <!-- Messages will be added here dynamically -->
-        </div>
-
+    <div class="umod-signature">
+        Powered by UMOD
+    </div>
+</main>
 
 
+        
     <div class="input-container">
         <div class="input-box">
             <input type="text" id="userInput" class="text-input" placeholder="Type here..." onkeypress="handleKeyPress(event)">
@@ -296,107 +300,149 @@
         </div>
     </div>
 
+
     <script>
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        async function typeMessage(text) {
-            const wrapper = document.createElement('div');
-            wrapper.classList.add('message-wrapper');
-
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', 'bot-message');
-
-            const textElement = document.createElement('div');
-            textElement.style.whiteSpace = 'pre-line';
-            
-            const cursor = document.createElement('span');
-            cursor.classList.add('cursor');
-            cursor.textContent = '|';
-
-            messageDiv.appendChild(textElement);
-            messageDiv.appendChild(cursor);
-
-            const timeDiv = document.createElement('div');
-            timeDiv.classList.add('message-time');
-            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            messageDiv.appendChild(timeDiv);
-
-            wrapper.appendChild(messageDiv);
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.appendChild(wrapper);
-            scrollToBottom();
-
-            const typingSpeed = 10;
-            let currentText = '';
-            for (let i = 0; i < text.length; i++) {
-                currentText += text[i];
-                textElement.textContent = currentText;
-                await sleep(typingSpeed);
-                scrollToBottom();
-            }
-
-            cursor.style.display = 'none';
-        }
-
-        function createUserMessage(text) {
-            const wrapper = document.createElement('div');
-            wrapper.classList.add('message-wrapper', 'user');
-        
-            const message = document.createElement('div');
-            message.classList.add('message', 'user-message');
-            message.textContent = text;
-
-            const timeDiv = document.createElement('div');
-            timeDiv.classList.add('message-time');
-            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            message.appendChild(timeDiv);
-        
-            wrapper.appendChild(message);
-            document.getElementById('chatContainer').appendChild(wrapper);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-
-            if (text !== '') {
-                createUserMessage(text);
-                input.value = '';
-
-                try {
-                    const response = await fetch('/api', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text })
-                    });
-                    
-                    const data = await response.json();
-                    await typeMessage(data.response);
-                } catch (error) {
-                    console.error('Error:', error);
-                    await typeMessage('Sorry, there was an error processing your message.');
-                }
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // Add welcome message on page load
+        // Move your existing window.onload into a separate function
         window.onload = function() {
+            // Update header text again to ensure it's set
+            const productName = getProductNameFromUrl();
+            document.querySelector('.header-text h1').textContent = productName;
+            
+            // Your existing welcome message
             typeMessage('Welcome! How can I help you today?');
         }
     </script>
+
+    
+
+<script>
+    // Utility function for delay
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Function to animate bot typing message
+    async function typeMessage(text) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('message-wrapper');
+
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'bot-message');
+
+        const textElement = document.createElement('div');
+        textElement.style.whiteSpace = 'pre-line';
+
+        const cursor = document.createElement('span');
+        cursor.classList.add('cursor');
+        cursor.textContent = '|';
+
+        messageDiv.appendChild(textElement);
+        messageDiv.appendChild(cursor);
+
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        messageDiv.appendChild(timeDiv);
+
+        wrapper.appendChild(messageDiv);
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.appendChild(wrapper);
+        scrollToBottom();
+
+        const typingSpeed = 10;
+        let currentText = '';
+        for (let i = 0; i < text.length; i++) {
+            currentText += text[i];
+            textElement.textContent = currentText;
+            await sleep(typingSpeed);
+            scrollToBottom();
+        }
+
+        cursor.style.display = 'none';
+    }
+
+    // Function to create and display user message
+    function createUserMessage(text) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('message-wrapper', 'user');
+
+        const message = document.createElement('div');
+        message.classList.add('message', 'user-message');
+        message.textContent = text;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        message.appendChild(timeDiv);
+
+        wrapper.appendChild(message);
+        document.getElementById('chatContainer').appendChild(wrapper);
+        scrollToBottom();
+    }
+
+    // Function to auto-scroll chat container to the latest message
+    function scrollToBottom() {
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Function to handle sending messages
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+
+        if (text !== '') {
+            createUserMessage(text);
+            input.value = '';
+
+            // Show "Hm.." indicator while bot is processing
+            const thinkingWrapper = document.createElement('div');
+            thinkingWrapper.classList.add('message-wrapper');
+
+            const thinkingIndicator = document.createElement('div');
+            thinkingIndicator.classList.add('thinking-indicator');
+            thinkingIndicator.textContent = 'Hm..';
+
+            thinkingWrapper.appendChild(thinkingIndicator);
+
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.appendChild(thinkingWrapper);
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+
+                // Remove "Hm.." indicator
+                thinkingWrapper.remove();
+
+                // Display actual response
+                await typeMessage(data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                thinkingWrapper.remove();
+                await typeMessage('Sorry, there was an error processing your message.');
+            }
+        }
+    }
+
+    // Function to handle Enter key for sending messages
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    // Add welcome message on page load
+    window.onload = function() {
+        typeMessage('Welcome! How can I help you today?');
+    }
+</script>
+
 </body>
 </html>
