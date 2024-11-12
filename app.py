@@ -1,20 +1,30 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from datetime import datetime
 from database_manager import DatabaseManager
+from flask_session import Session 
+import uuid
 
-
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Set a secret key for session encryption
+
+# Configure Flask-Session for server-side session storage
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+# Database configuration
 db_endpoint = os.environ.get("DB_ENDPOINT")
 db_user = os.environ.get("DB_USERNAME")
 db_password = os.environ.get("DB_PASSWORD")
 db_port = os.environ.get("DB_PORT")
 db_name = os.environ.get("DB_NAME")
-# Database setup:
+
+# Initialize database configuration
 db_config = {
     'host': db_endpoint,
     'dbname': db_name,
@@ -23,17 +33,13 @@ db_config = {
     'port': db_port
 }
 
+# Database and OpenAI initialization
 db_manager = DatabaseManager()
 db_manager.connect()
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
-
-# Define the function to look up prices
+# Price function definition for use with OpenAI
 def get_price(product_name, prices_table):
-    # Check if product is in the table, return price
     return prices_table.get(product_name, "Price not found")
 
 price_function = {
@@ -48,7 +54,7 @@ price_function = {
     }
 }
 
-
+# Routes for rendering templates
 @app.route('/')
 def home():
     return render_template('index.html', title="Home")
@@ -69,34 +75,55 @@ def yamahayzf1000():
 def nordica():
     return render_template('index.html', title="Nordica Bootfitter")
 
-# API route that uses dynamic file content
+
 @app.route('/api', methods=['POST'])
 def api_call():
     user_input = request.json.get('text')
-    # Determine which file content to use based on the referer URL
     route_name = request.referrer.split('/')[-1]  # Get last part of URL, e.g., "airpods"
+    
+    # Retrieve context from the database
     file_content = db_manager.fetch_data("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
-    print(file_content)
 
-    # Use OpenAI API with the appropriate file content
+    # Initialize session message history if it doesn't exist
+    if 'messages' not in session:
+        session['messages'] = []
+    
+    # Assign or retrieve the chat_id for the session
+    if 'chat_id' not in session:
+        session['chat_id'] = str(uuid.uuid4())  # Generate a unique chat_id
+
+    # Append the user's message to the session history
+    session['messages'].append({"role": "user", "content": user_input + f"Regarding my {route_name}:"})
+
+    # Prepare messages for OpenAI API call, starting with the system content
+    messages = [{"role": "system", "content": file_content}]
+    messages.extend(session['messages'])  # Add conversation history
+
+    # Make the API call to OpenAI with the conversation history
     chat_completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": file_content },
-            {"role": "user", "content": user_input + f"Regarding my {route_name}:"},
-        ],
+        messages=messages,
         functions=[price_function],
         function_call="auto"
     )
+
     response = chat_completion.choices[0].message.content
-    print(response)
+    session['messages'].append({"role": "assistant", "content": response})  # Add assistant response to history
 
-
-    log_query = "INSERT INTO questionlog (product, question, response) VALUES (%s, %s, %s)"
-    params = (route_name, user_input, response)
-
+    # Log the interaction in the database with chat_id
+    log_query = "INSERT INTO questionlog (product, question, response, chat_id) VALUES (%s, %s, %s, %s)"
+    params = (route_name, user_input, response, session['chat_id'])
     db_manager.write_data(query=log_query, params=params)
-    return jsonify({"response": response})  # Wrap response in JSON
+
+    # Replace special characters and return JSON response
+    response = response.replace("\ue61f", "&trade;")
+    return jsonify({"response": response})
+
+# Endpoint to clear the session history (useful for debugging or starting new conversations)
+@app.route('/clear_session', methods=['POST'])
+def clear_session():
+    session.pop('messages', None)
+    return jsonify({"status": "session cleared"})
 
 if __name__ == '__main__':
     app.run(debug=True)
