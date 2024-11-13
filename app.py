@@ -6,6 +6,7 @@ from datetime import datetime
 from database_manager import DatabaseManager
 from flask_session import Session 
 import uuid
+from langdetect import detect
 
 # Load environment variables
 load_dotenv()
@@ -34,8 +35,15 @@ db_config = {
 }
 
 # Database and OpenAI initialization
-db_manager = DatabaseManager()
-db_manager.connect()
+try:
+    db_manager = DatabaseManager()
+except ValueError:
+    raise ValueError("Construction of the db_manager failed.")
+
+try:
+    db_manager.connect()
+except ConnectionError:
+    raise ConnectionError("")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # Price function definition for use with OpenAI
@@ -79,10 +87,11 @@ def nordica():
 @app.route('/api', methods=['POST'])
 def api_call():
     user_input = request.json.get('text')
+    question_language = detect(user_input)
     route_name = request.referrer.split('/')[-1]  # Get last part of URL, e.g., "airpods"
     
     # Retrieve context from the database
-    file_content = db_manager.fetch_data("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
+    file_content = db_manager.fetch_context("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
 
     # Initialize session message history if it doesn't exist
     if 'messages' not in session:
@@ -108,11 +117,14 @@ def api_call():
     )
 
     response = chat_completion.choices[0].message.content
+    response_language = detect(response)
+    print("reponse language", response_language)
+    print("question language", question_language)
     session['messages'].append({"role": "assistant", "content": response})  # Add assistant response to history
 
     # Log the interaction in the database with chat_id
-    log_query = "INSERT INTO questionlog (product, question, response, chat_id) VALUES (%s, %s, %s, %s)"
-    params = (route_name, user_input, response, session['chat_id'])
+    log_query = "INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang) VALUES (%s, %s, %s, %s, %s, %s)"
+    params = (route_name, user_input, response, session['chat_id'], question_language, response_language)
     db_manager.write_data(query=log_query, params=params)
 
     # Replace special characters and return JSON response

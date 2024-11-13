@@ -6,37 +6,55 @@ import os
 class DatabaseManager:
     def __init__(self):
         load_dotenv()
-        self.db_config = {
-            'host': os.environ.get("DB_ENDPOINT"),
-            'dbname': os.environ.get("DB_NAME"),
-            'user': os.environ.get("DB_USERNAME"),
-            'password': os.environ.get("DB_PASSWORD"),
-            'port': os.environ.get("DB_PORT")
-        }
-        self.connection = None
+        try:
+            self.db_config = {
+                'host': os.environ.get("DB_ENDPOINT"),
+                'dbname': os.environ.get("DB_NAME"),
+                'user': os.environ.get("DB_USERNAME"),
+                'password': os.environ.get("DB_PASSWORD"),
+                'port': os.environ.get("DB_PORT")
+            }
+            self.connection = None
+        except ValueError as e:  
+            raise ValueError(f"Enviroment variables are missing! Contact manager for proper credentials. {e}") from e
+
 
     def connect(self):
         """Establish a database connection."""
         try:
             self.connection = psycopg2.connect(**self.db_config)
         except Exception as e:
-            print(f"Error connecting to database: {e}")
             self.connection = None
+            raise ConnectionError(f"Error connecting to database: {e}")
 
     def close(self):
         """Close the database connection."""
         if self.connection:
             self.connection.close()
 
-    def fetch_data(self, query, params=None):
+    def fetch_context(self, query, params=None):
         """Fetch data from the database and return as a single string."""
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, params)
             result = cursor.fetchall()
         return str(result)
+    
+    def fetch_productlist(self, table: str):
+        query = f"SELECT DISTINCT product FROM {table};"
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+        return result
+    
+    def fetch_questions(self, product: str):
+        query = f"SELECT question FROM questionlog WHERE product = '{product}';"
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+        return result
 
     def write_data(self, query, params=None):
-        """Write data to the database."""
+        """Write data to the database."""   
         with self.connection.cursor() as cursor:
             cursor.execute(query, params)
             self.connection.commit()
