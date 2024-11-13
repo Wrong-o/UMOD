@@ -175,23 +175,26 @@ main {
     display: flex;
     margin: 8px 0;
     width: 100%;
+    position: relative;
+        }
+
+        .message-wrapper.user {
+    justify-content: flex-end;
+    width: 100%;
 }
 
-.message-wrapper.user {
-    justify-content: flex-end;
-}
+
 
 .message {
     padding: 15px 20px;
-    max-width: 70%;
-    word-wrap: break-word;
-    position: relative;
-    border-radius: 20px;
-    font-size: 15px;
-    line-height: 1.4;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
 .user-message {
     background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
@@ -230,6 +233,52 @@ main {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
+
+
+.feedback-container {
+    position: absolute;
+    right: 200px; /* Öka avståndet lite */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    background-color: rgba(255,255,255,0.8); /* För bättre synlighet */
+    padding: 0px;
+    border-radius: 5px;
+}
+
+        .message-wrapper:not(.user):hover .feedback-container {
+            opacity: 1;
+        }
+
+        .feedback-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.2em;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+        .feedback-button:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .feedback-button.selected {
+            opacity: 1;
+            color: #4CAF50;
+        }
+
+        .feedback-button.selected.negative {
+            color: #f44336;
+        }
 
 
    </style>
@@ -318,132 +367,181 @@ main {
     
 
 <script>
-    // Utility function for delay
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+  // Utility function for delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Function to animate bot typing message
+async function typeMessage(text) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message-wrapper');
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'bot-message');
+
+    const textElement = document.createElement('div');
+    textElement.style.whiteSpace = 'pre-line';
+
+    // Create feedback container
+    const feedbackContainer = document.createElement('div');
+    feedbackContainer.classList.add('feedback-container');
+    feedbackContainer.style.display = 'flex';
+
+    // Create thumbs up button
+    const thumbsUp = document.createElement('button');
+    thumbsUp.classList.add('feedback-button');
+    thumbsUp.innerHTML = '👍';
+    thumbsUp.style.fontSize = '16px'; // Gör emojin större
+    thumbsUp.onclick = function() {
+        handleFeedback(this, true);
+    };
+
+    // Create thumbs down button
+    const thumbsDown = document.createElement('button');
+    thumbsDown.classList.add('feedback-button');
+    thumbsDown.innerHTML = '👎';
+    thumbsDown.style.fontSize = '16px';
+    thumbsDown.onclick = function() {
+        handleFeedback(this, false);
+    };
+
+    feedbackContainer.appendChild(thumbsUp);
+    feedbackContainer.appendChild(thumbsDown);
+
+    const cursor = document.createElement('span');
+    cursor.classList.add('cursor');
+    cursor.textContent = '|';
+
+    messageDiv.appendChild(textElement);
+    messageDiv.appendChild(cursor);
+
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('message-time');
+    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageDiv.appendChild(timeDiv);
+
+    // Se till att dessa två rader kommer i rätt ordning
+    wrapper.appendChild(messageDiv);
+    wrapper.appendChild(feedbackContainer); 
+    
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.appendChild(wrapper);
+    scrollToBottom();
+
+    const typingSpeed = 10;
+    let currentText = '';
+    for (let i = 0; i < text.length; i++) {
+        currentText += text[i];
+        textElement.textContent = currentText;
+        await sleep(typingSpeed);
+        scrollToBottom();
     }
 
-    // Function to animate bot typing message
-    async function typeMessage(text) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('message-wrapper');
+    cursor.style.display = 'none';
+}
 
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', 'bot-message');
+// Function to handle feedback
+function handleFeedback(button, isPositive) {
+    const container = button.parentElement;
+    const buttons = container.getElementsByClassName('feedback-button');
+    
+    // Remove selected class from all buttons
+    Array.from(buttons).forEach(btn => {
+        btn.classList.remove('selected', 'negative');
+    });
+    
+    // Add selected class to clicked button
+    button.classList.add('selected');
+    if (!isPositive) {
+        button.classList.add('negative');
+    }
 
-        const textElement = document.createElement('div');
-        textElement.style.whiteSpace = 'pre-line';
+    // Here you can add API call to save feedback
+    console.log(`Feedback: ${isPositive ? 'positive' : 'negative'}`);
+}
 
-        const cursor = document.createElement('span');
-        cursor.classList.add('cursor');
-        cursor.textContent = '|';
+// Function to create and display user message
+function createUserMessage(text) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message-wrapper', 'user');
 
-        messageDiv.appendChild(textElement);
-        messageDiv.appendChild(cursor);
+    const message = document.createElement('div');
+    message.classList.add('message', 'user-message');
+    message.textContent = text;
 
-        const timeDiv = document.createElement('div');
-        timeDiv.classList.add('message-time');
-        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        messageDiv.appendChild(timeDiv);
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('message-time');
+    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    message.appendChild(timeDiv);
 
-        wrapper.appendChild(messageDiv);
+    wrapper.appendChild(message);
+    document.getElementById('chatContainer').appendChild(wrapper);
+    scrollToBottom();
+}
+
+// Function to auto-scroll chat container to the latest message
+function scrollToBottom() {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Function to handle sending messages
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+
+    if (text !== '') {
+        createUserMessage(text);
+        input.value = '';
+
+        // Show "Hm.." indicator while bot is processing
+        const thinkingWrapper = document.createElement('div');
+        thinkingWrapper.classList.add('message-wrapper');
+
+        const thinkingIndicator = document.createElement('div');
+        thinkingIndicator.classList.add('thinking-indicator');
+        thinkingIndicator.textContent = 'Hm..';
+
+        thinkingWrapper.appendChild(thinkingIndicator);
+
         const chatContainer = document.getElementById('chatContainer');
-        chatContainer.appendChild(wrapper);
+        chatContainer.appendChild(thinkingWrapper);
         scrollToBottom();
 
-        const typingSpeed = 10;
-        let currentText = '';
-        for (let i = 0; i < text.length; i++) {
-            currentText += text[i];
-            textElement.textContent = currentText;
-            await sleep(typingSpeed);
-            scrollToBottom();
-        }
+        try {
+            const response = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
 
-        cursor.style.display = 'none';
-    }
+            const data = await response.json();
 
-    // Function to create and display user message
-    function createUserMessage(text) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('message-wrapper', 'user');
+            // Remove "Hm.." indicator
+            thinkingWrapper.remove();
 
-        const message = document.createElement('div');
-        message.classList.add('message', 'user-message');
-        message.textContent = text;
-
-        const timeDiv = document.createElement('div');
-        timeDiv.classList.add('message-time');
-        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        message.appendChild(timeDiv);
-
-        wrapper.appendChild(message);
-        document.getElementById('chatContainer').appendChild(wrapper);
-        scrollToBottom();
-    }
-
-    // Function to auto-scroll chat container to the latest message
-    function scrollToBottom() {
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // Function to handle sending messages
-    async function sendMessage() {
-        const input = document.getElementById('userInput');
-        const text = input.value.trim();
-
-        if (text !== '') {
-            createUserMessage(text);
-            input.value = '';
-
-            // Show "Hm.." indicator while bot is processing
-            const thinkingWrapper = document.createElement('div');
-            thinkingWrapper.classList.add('message-wrapper');
-
-            const thinkingIndicator = document.createElement('div');
-            thinkingIndicator.classList.add('thinking-indicator');
-            thinkingIndicator.textContent = 'Hm..';
-
-            thinkingWrapper.appendChild(thinkingIndicator);
-
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.appendChild(thinkingWrapper);
-            scrollToBottom();
-
-            try {
-                const response = await fetch('/api', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-
-                const data = await response.json();
-
-                // Remove "Hm.." indicator
-                thinkingWrapper.remove();
-
-                // Display actual response
-                await typeMessage(data.response);
-            } catch (error) {
-                console.error('Error:', error);
-                thinkingWrapper.remove();
-                await typeMessage('Sorry, there was an error processing your message.');
-            }
+            // Display actual response
+            await typeMessage(data.response);
+        } catch (error) {
+            console.error('Error:', error);
+            thinkingWrapper.remove();
+            await typeMessage('Sorry, there was an error processing your message.');
         }
     }
+}
 
-    // Function to handle Enter key for sending messages
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
-        }
+// Function to handle Enter key for sending messages
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
     }
+}
 
-    // Add welcome message on page load
-    window.onload = function() {
-        typeMessage('Welcome! How can I help you today?');
-    }
+// Add welcome message on page load
+window.onload = function() {
+    typeMessage('Welcome! How can I help you today?');
+}
 </script>
 
 </body>
