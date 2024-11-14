@@ -46,8 +46,15 @@ class DatabaseManager:
             result = cursor.fetchall()
         return result
     
-    def fetch_questions(self, product: str):
-        query = f"SELECT question FROM questionlog WHERE product = '{product}';"
+    def fetch_questions_by_language(self, product: str, language: str):
+        query = "SELECT question FROM questionlog WHERE product = %s AND q_lang = %s;"
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (product, language))
+            result = cursor.fetchall()
+        return result
+    
+    def fetch_languageslist(self, table: str):
+        query = f"SELECT DISTINCT q_lang FROM {table}"
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
