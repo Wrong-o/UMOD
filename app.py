@@ -90,9 +90,6 @@ def clear_session():
     session.pop('messages', None)
     return jsonify({"status": "session cleared"})
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 @app.route('/api', methods=['POST'])
 def api_call():
     try:  
