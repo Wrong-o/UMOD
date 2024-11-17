@@ -356,11 +356,13 @@ main {
     <script>
         // Move your existing window.onload into a separate function
         window.onload = function() {
-    const productName = getProductNameFromUrl();
-    document.querySelector('.header-text h1').textContent = productName;
-
-    typeMessage('Welcome! How can I help you today?', true); // Andra version (onödig)
-};
+            // Update header text again to ensure it's set
+            const productName = getProductNameFromUrl();
+            document.querySelector('.header-text h1').textContent = productName;
+            
+            // Your existing welcome message
+            typeMessage('Welcome! How can I help you today?');
+        }
     </script>
 
     
@@ -372,18 +374,17 @@ main {
     }
     
     // Function to animate bot typing message
-    async function typeMessage(text, isFirstMessage = false) {
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('message-wrapper');
-
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', 'bot-message');
-
-    const textElement = document.createElement('div');
-    textElement.style.whiteSpace = 'pre-line';
+    async function typeMessage(text) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('message-wrapper');
+    
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'bot-message');
+    
+        const textElement = document.createElement('div');
+        textElement.style.whiteSpace = 'pre-line';
     
         // Create feedback container
-        if (!isFirstMessage) {
         const feedbackContainer = document.createElement('div');
         feedbackContainer.classList.add('feedback-container');
         feedbackContainer.style.display = 'flex';
@@ -526,6 +527,44 @@ function handleFeedback(button, isPositive) {
         alert('Failed to save feedback. Please try again.');
     });
 }
+
+        then(() => {
+            // Show success message
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #4CAF50;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                font-family: 'Poppins', sans-serif;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            `;
+            toast.textContent = 'Thank you for your feedback!';
+            document.body.appendChild(toast);
+    
+            // Show and hide toast
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 2000);
+            }, 100);
+        })
+        .catch(error => {
+            console.error('Error saving feedback:', error);
+            button.classList.remove('selected', 'negative');
+            alert('Failed to save feedback. Please try again.');
+        });
     
     
     // Function to create and display user message
@@ -607,13 +646,8 @@ function handleFeedback(button, isPositive) {
     
     // Add welcome message on page load
     window.onload = function() {
-    // Update header text again to ensure it's set
-    const productName = getProductNameFromUrl();
-    document.querySelector('.header-text h1').textContent = productName;
-    
-    // Pass true to indicate this is the first message
-    typeMessage('Welcome! How can I help you today?', true);
-}
+        typeMessage('Welcome! How can I help you today?');
+    }
     </script>
 
 </body>
