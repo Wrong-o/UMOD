@@ -83,8 +83,11 @@ def yamahayzf1000():
 def nordica():
     return render_template('index.html', title="Nordica Bootfitter")
 
+@app.route('/yamahar1')
+def yamahar1():
+    return render_template('index.html', title="yamahar1")
 
-# Endpoint to clear the session history (useful for debugging or starting new conversations)
+
 @app.route('/clear_session', methods=['POST'])
 def clear_session():
     session.pop('messages', None)
