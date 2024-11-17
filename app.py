@@ -116,20 +116,20 @@ def api_call():
         function_call="auto"
     )
 
+    print(chat_completion)
     response = chat_completion.choices[0].message.content
     response_language = detect(response)
-    print("reponse language", response_language)
-    print("question language", question_language)
     session['messages'].append({"role": "assistant", "content": response})  # Add assistant response to history
 
     # Log the interaction in the database with chat_id
     log_query = "INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang) VALUES (%s, %s, %s, %s, %s, %s)"
     params = (route_name, user_input, response, session['chat_id'], question_language, response_language)
+    message_id = db_manager.write_data(query=log_query, params=params)
     db_manager.write_data(query=log_query, params=params)
 
     # Replace special characters and return JSON response
     response = response.replace("\ue61f", "&trade;")
-    return jsonify({"response": response})
+    return jsonify({"response": response, "message_id": message_id})
 
 # Endpoint to clear the session history (useful for debugging or starting new conversations)
 @app.route('/clear_session', methods=['POST'])
@@ -137,5 +137,21 @@ def clear_session():
     session.pop('messages', None)
     return jsonify({"status": "session cleared"})
 
+
+@app.route('/submit_feedback', methods=['GET', 'POST'])
+def submit_feedback():
+    data = request.json
+    message_id = data.get('message_id')
+    feedback = data.get('feedback')  # 1 for positive, 0 for negative
+    # Update the message record with feedback
+    update_query = "UPDATE questionlog SET feedback = %s WHERE id = %s"
+    params = (feedback, message_id)
+    db_manager.write_data(query=update_query, params=params)
+
+    return jsonify({"status": "Feedback received"})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+

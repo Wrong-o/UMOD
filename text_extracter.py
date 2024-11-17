@@ -1,8 +1,11 @@
 import fitz  
 
+
+#1. Skriv in vad PDFen heter
+#2. Skriv txt filen i snake_case
 # Path to PDF and output text file
-pdf_path = "nordica.pdf"
-txt_output_path = "nordica.txt"
+pdf_path = "XBOX360.pdf"
+txt_output_path = "xbox_360.txt"
 
 # Open the PDF file
 with fitz.open(pdf_path) as pdf:

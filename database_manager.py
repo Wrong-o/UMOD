@@ -65,3 +65,13 @@ class DatabaseManager:
         with self.connection.cursor() as cursor:
             cursor.execute(query, params)
             self.connection.commit()
+    
+    def add_manual(self, product: str, manual: str):
+        query = "INSERT INTO context (product, context) VALUES (%s, %s)"
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (product, manual))
+            self.connection.commit()
+
+
+
+    
