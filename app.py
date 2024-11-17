@@ -95,7 +95,7 @@ def api_call():
     try:  
         user_input = request.json.get('text')
         question_language = detect(user_input)
-        route_name = request.referrer.split('/')[-1]  # Get last part of URL, e.g., "airpods"
+        route_name = request.referrer.split('/')[-1] 
         
         # Retrieve context from the database
         file_content = db_manager.fetch_context("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
@@ -108,8 +108,11 @@ def api_call():
         if 'chat_id' not in session:
             session['chat_id'] = str(uuid.uuid4())  # Generate a unique chat_id
 
-        # Append the user's message to the session history
-        session['messages'].append({"role": "user", "content": user_input + f"Regarding my {route_name}:"})
+        # Append the user's message to the session history with a unique identifier
+        session['messages'].append({
+            "role": "user",
+            "content": user_input + f"Regarding my {route_name}:"
+        })
 
         # Prepare messages for OpenAI API call, starting with the system content
         messages = [{"role": "system", "content": file_content}]
@@ -123,34 +126,49 @@ def api_call():
             function_call="auto"
         )
 
+        # Generate unique ID for assistant's response message
+        assistant_message_id = str(uuid.uuid4())
+
         response = chat_completion.choices[0].message.content
         response_language = detect(response)
-        print("reponse language", response_language)
+        print("response language", response_language)
         print("question language", question_language)
-        session['messages'].append({"role": "assistant", "content": response})  # Add assistant response to history
 
-        # Log the interaction in the database with chat_id
-        log_query = "INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang) VALUES (%s, %s, %s, %s, %s, %s)"
-        params = (route_name, user_input, response, session['chat_id'], question_language, response_language)
+        # Append assistant's response to the session history with a unique identifier
+        session['messages'].append({
+            "role": "assistant",
+            "content": response,
+            "message_id": assistant_message_id
+        })
+
+        # Log the interaction in the database with chat_id and message IDs
+        log_query = """
+            INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        params = (
+            route_name, user_input, response, session['chat_id'], question_language, response_language,
+            assistant_message_id
+        )
         db_manager.write_data(query=log_query, params=params)
 
         # Replace special characters and return JSON response
         response = response.replace("\ue61f", "&trade;")
-        return jsonify({"response": response})
+        return jsonify({"response": response, "response_id": assistant_message_id})
 
     except Exception as e:
-        print("MEMEMEMEME")
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
-    
+
 
 @app.route('/submit_feedback', methods=['POST'])  # Changed from GET to POST
 def submit_feedback():
     try:
         data = request.json  # Changed from args to json
+        print(data)
         helpful = data.get('helpful')
-        message = data.get('message', '')
-        
+        response_id = data.get('response_id')
+        print(response_id, helpful)
         # Get route name from referer header
         referer = request.headers.get('Referer', '')
         route_name = referer.split('/')[-1] if referer else 'unknown'
@@ -159,19 +177,18 @@ def submit_feedback():
         route_name = route_name.split('?')[0]  # Remove query parameters if any
         if not route_name:
             route_name = 'unknown'
-            
+        
         feedback_query = """
-            INSERT INTO feedback_log 
-            (product, message, is_helpful, chat_id) 
-            VALUES (%s, %s, %s, %s)
+            UPDATE questionlog 
+            SET helpful = %s
+            WHERE response_id = %s
         """
-        
-        chat_id = session.get('chat_id', str(uuid.uuid4()))
-        
+
+        # Make sure to correctly pass the parameters in the right order
         db_manager.write_data(
             query=feedback_query,
-            params=(route_name, message, helpful, chat_id)
-        )
+            params=(helpful, response_id)  # Corrected the parameter order
+)
 
         return jsonify({
             "status": "success", 
