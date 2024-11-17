@@ -441,7 +441,8 @@ main {
         cursor.style.display = 'none';
     }
     
-    function handleFeedback(button, isPositive) {
+    // Updated handleFeedback function
+function handleFeedback(button, isPositive) {
     const container = button.parentElement;
     const buttons = container.getElementsByClassName('feedback-button');
     
@@ -459,53 +460,64 @@ main {
     // Get the message content
     const messageWrapper = button.closest('.message-wrapper');
     const messageElement = messageWrapper.querySelector('.message');
+    const messageText = messageElement.textContent;
 
-    // Simple URL with boolean parameter
-    fetch(`/submit_feedback?helpful=${isPositive}&message=${encodeURIComponent(messageElement.textContent)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to save feedback');
-            }
-            return response.json();
+    // Send feedback using POST instead of GET
+    fetch('/submit_feedback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            helpful: isPositive,
+            message: messageText
         })
-        .then(() => {
-            // Show success message
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: #4CAF50;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 8px;
-                z-index: 1000;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                font-family: 'Poppins', sans-serif;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            `;
-            toast.textContent = 'Thank you for your feedback!';
-            document.body.appendChild(toast);
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to save feedback');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Show success message
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        `;
+        toast.textContent = 'Thank you for your feedback!';
+        document.body.appendChild(toast);
 
-            // Show and hide toast
+        // Show and hide toast
+        setTimeout(() => {
+            toast.style.opacity = '1';
             setTimeout(() => {
-                toast.style.opacity = '1';
+                toast.style.opacity = '0';
                 setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 300);
-                }, 2000);
-            }, 100);
-        })
-        .catch(error => {
-            console.error('Error saving feedback:', error);
-            button.classList.remove('selected', 'negative');
-            alert('Failed to save feedback. Please try again.');
-        });
+                    toast.remove();
+                }, 300);
+            }, 2000);
+        }, 100);
+    })
+    .catch(error => {
+        console.error('Error saving feedback:', error);
+        button.classList.remove('selected', 'negative');
+        alert('Failed to save feedback. Please try again.');
+    });
 }
+
         then(() => {
             // Show success message
             const toast = document.createElement('div');
