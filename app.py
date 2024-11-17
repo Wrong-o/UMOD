@@ -131,8 +131,7 @@ def api_call():
 
         response = chat_completion.choices[0].message.content
         response_language = detect(response)
-        print("response language", response_language)
-        print("question language", question_language)
+
 
         # Append assistant's response to the session history with a unique identifier
         session['messages'].append({
@@ -165,10 +164,8 @@ def api_call():
 def submit_feedback():
     try:
         data = request.json  # Changed from args to json
-        print(data)
         helpful = data.get('helpful')
         response_id = data.get('response_id')
-        print(response_id, helpful)
         # Get route name from referer header
         referer = request.headers.get('Referer', '')
         route_name = referer.split('/')[-1] if referer else 'unknown'
