@@ -477,8 +477,18 @@ main {
                 }
                 return response.json();
             })
-            .then(() => {
-                // Show success message
+        
+    
+    .then(() => {
+                   // Fade out and remove the feedback container
+           container.style.transition = 'opacity 0.3s ease';
+        container.style.opacity = '0';
+        
+        setTimeout(() => {
+            container.remove();
+        }, 300);
+        
+        // Show success message
                 const toast = document.createElement('div');
                 toast.style.cssText = `
                     position: fixed;
