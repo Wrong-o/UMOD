@@ -1,3 +1,4 @@
+from flask import Flask, send_from_directory
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
@@ -10,6 +11,7 @@ from langdetect import detect
 
 # Load environment variables
 load_dotenv()
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Set a secret key for session encryption
@@ -86,6 +88,10 @@ def nordica():
 @app.route('/yamahar1')
 def yamahar1():
     return render_template('index.html', title="yamahar1")
+
+@app.route('/style.css')
+def serve_css():
+    return send_from_directory('templates', 'style.css')
 
 
 @app.route('/clear_session', methods=['POST'])
