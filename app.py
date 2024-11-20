@@ -64,6 +64,10 @@ class FeedbackRequest(BaseModel):
     helpful: bool
     response_id: str
 
+# Define request model for API input
+class APIRequest(BaseModel):
+    text: str
+
 # Routes for rendering templates
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -96,11 +100,12 @@ async def clear_session(request: Request):
     return {"status": "session cleared"}
 
 @app.post("/api")
-async def api_call(request: Request, user_input: str = Form(...)):
+async def api_call(request: Request, api_request: APIRequest):
     try:
+        user_input = api_request.text
         # Detect input language
         question_language = detect(user_input)
-        route_name = request.headers.get("referer", "").split('/')[-1]
+        route_name = "unknown"  # Placeholder until request headers can be accessed properly
 
         # Retrieve context from the database
         file_content = db_manager.fetch_context("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
