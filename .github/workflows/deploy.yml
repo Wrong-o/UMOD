@@ -38,6 +38,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Make deploy.sh executable
+            chmod +x deploy.sh
+            
             # Verify Docker is accessible
             docker ps
             
