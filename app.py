@@ -73,7 +73,7 @@ class APIRequest(BaseModel):
 # Routes for rendering templates
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "Home"})
+    return templates.TemplateResponse('login.html', {"request": request, "title": "Home"})
 
 @app.get("/airpods", response_class=HTMLResponse)
 async def airpods(request: Request):
