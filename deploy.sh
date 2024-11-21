@@ -3,8 +3,10 @@
 # Stop on errors
 set -e
 
-# Navigate to the app directory
+echo "Current working directory: $(pwd)"
+echo "Attempting to change directory to ~/UMOD"
 cd ~/UMOD
+echo "Changed directory successfully"
 
 # Pull latest changes from main branch
 git fetch origin main
