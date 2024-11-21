@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
 from datetime import datetime
-from .database_manager import DatabaseManager
+from database_manager import DatabaseManager
 from uuid import uuid4
 from langdetect import detect
 import os
@@ -87,11 +87,16 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
-# Routes for rendering templates
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    logger.info("Home page accessed")
-    return templates.TemplateResponse('index.html', {"request": request, "title": "Home"})
+async def home():
+    # Redirect to the login page by default
+    return RedirectResponse(url="/login")
+
+@app.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    logger.info("Login page accessed")
+    return templates.TemplateResponse('login.html', {"request": request, "title": "Login"})
+
 
 @app.get("/airpods", response_class=HTMLResponse)
 async def airpods(request: Request):
