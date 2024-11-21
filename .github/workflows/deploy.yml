@@ -32,5 +32,6 @@ jobs:
           port: 22                             # Default SSH port
           script: |
             cd ~/UMOD
+            ls -la
             ./deploy.sh
           debug: true 
