@@ -31,7 +31,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}      # Reference the secret containing your private SSH key
           port: 22                             # Default SSH port
           script: |
-            cd ~/UMOD
+            cd ~
             docker ps
             ls -la
             ./deploy.sh
