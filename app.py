@@ -18,14 +18,12 @@ load_dotenv()
 
 # Configure logging
 logging.basicConfig(
-    filename="app.log",
-    filemode="a",  # Append to the log file, 'w' would overwrite it each time
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -34,7 +32,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Set up Jinja2 Templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="static")
 try:
     # Database configuration
     db_endpoint = os.environ.get("DB_ENDPOINT")
@@ -114,7 +112,7 @@ async def clear_session(request: Request):
 
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest):
-    logger.info(f"An api call was made")
+    logger.info("An api call was made")
     try:
         user_input = api_request.text
         # Detect input language
