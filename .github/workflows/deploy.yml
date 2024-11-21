@@ -32,5 +32,5 @@ jobs:
           port: 22                             # Default SSH port
           script: |
             cd ~
-            ./deploy.sh
+            /deploy.sh
           debug: true 
