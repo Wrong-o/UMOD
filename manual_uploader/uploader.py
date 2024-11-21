@@ -2,7 +2,7 @@ import os
 import fitz
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from database_manager import DatabaseManager
+from UMOD.app.database_manager import DatabaseManager
 import tkinter as tk
 from tkinter import filedialog, scrolledtext, messagebox
 
