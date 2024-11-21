@@ -17,6 +17,9 @@ jobs:
       - name: Verify Hostname
         run: |
           echo "Hostname: ${{ secrets.EC2_HOST }}"
+      - name: Add to known_hosts
+        run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        
 
       # Step 2: Deploy to EC2 via SSH using the private key stored in GitHub Secrets
       - name: Deploy to EC2 via SSH
