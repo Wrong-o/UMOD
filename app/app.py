@@ -32,7 +32,7 @@ templates_directory = os.path.join(current_directory, "templates")
 static_directory = os.path.join(current_directory, "static")
 
 app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
-app.mount("/static", StaticFiles(directory=templates_directory), name="static")
+app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -40,7 +40,8 @@ app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 # Serve static files like CSS, JS
 
 # Set up Jinja2 Templates
-templates = Jinja2Templates(directory="./templates")
+templates = Jinja2Templates(directory=templates_directory)
+
 try:
     # Database configuration
     db_endpoint = os.environ.get("DB_ENDPOINT")
