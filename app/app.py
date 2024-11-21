@@ -26,8 +26,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 app = FastAPI()
-app.mount("/templates", StaticFiles(directory="./templates"), name="templates")
-app.mount("/static", StaticFiles(directory="./static"), name="static")
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+templates_directory = os.path.join(current_directory, "templates")
+static_directory = os.path.join(current_directory, "static")
+
+app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
+app.mount("/static", StaticFiles(directory=templates_directory), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
