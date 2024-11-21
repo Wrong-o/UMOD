@@ -31,8 +31,19 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}      # Reference the secret containing your private SSH key
           port: 22                             # Default SSH port
           script: |
+            # Navigate to the directory containing the project
             cd ~/UMOD
+            
+            # Pull the latest changes from the GitHub repository
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Verify Docker is accessible
             docker ps
+            
+            # List directory contents for verification
             ls -la
+
+            # Execute the deployment script
             ./deploy.sh
-          debug: true 
+          debug: true
