@@ -11,9 +11,19 @@ from database_manager import DatabaseManager
 from uuid import uuid4
 from langdetect import detect
 import os
+import logging
 
 # Load environment variables
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    filename="app.log",
+    filemode="a",  # Append to the log file, 'w' would overwrite it each time
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -73,6 +83,7 @@ class APIRequest(BaseModel):
 # Routes for rendering templates
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    logger.info("Home page accessed")
     return templates.TemplateResponse('login.html', {"request": request, "title": "Home"})
 
 @app.get("/airpods", response_class=HTMLResponse)
@@ -103,6 +114,7 @@ async def clear_session(request: Request):
 
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest):
+    logger.info(f"An api call was made")
     try:
         user_input = api_request.text
         # Detect input language
