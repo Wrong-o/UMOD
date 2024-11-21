@@ -82,7 +82,7 @@ class APIRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     logger.info("Home page accessed")
-    return templates.TemplateResponse('login.html', {"request": request, "title": "Home"})
+    return templates.TemplateResponse('index.html', {"request": request, "title": "Home"})
 
 @app.get("/airpods", response_class=HTMLResponse)
 async def airpods(request: Request):
