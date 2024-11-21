@@ -25,13 +25,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Set up Jinja2 Templates
 templates = Jinja2Templates(directory="templates")
-
-# Database configuration
-db_endpoint = os.environ.get("DB_ENDPOINT")
-db_user = os.environ.get("DB_USERNAME")
-db_password = os.environ.get("DB_PASSWORD")
-db_port = os.environ.get("DB_PORT")
-db_name = os.environ.get("DB_NAME")
+try:
+    # Database configuration
+    db_endpoint = os.environ.get("DB_ENDPOINT")
+    db_user = os.environ.get("DB_USERNAME")
+    db_password = os.environ.get("DB_PASSWORD")
+    db_port = os.environ.get("DB_PORT")
+    db_name = os.environ.get("DB_NAME")
+except:
+    raise KeyError("Database credentials where not loaded")
 
 # Initialize database configuration
 db_config = {
@@ -51,7 +53,7 @@ except ValueError:
 try:
     db_manager.connect()
 except ConnectionError:
-    raise ConnectionError("")
+    raise ConnectionError("Could not connect to the database")
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
