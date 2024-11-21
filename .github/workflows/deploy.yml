@@ -1,13 +1,28 @@
-name: SSH Debugging
-on: [push]
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  test-ssh:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Debug SSH Connection
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        run: |
-          echo "$SSH_KEY" > ssh_key
-          chmod 600 ssh_key
-          ssh -vvv -i ssh_key ec2-user@${{ secrets.EC2_HOST }}
+      # Step 1: Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3 
+
+      # Step 2: Deploy to EC2 via SSH using the private key stored in GitHub Secrets
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.EC2_HOST }}       # The public IP address or DNS name of your EC2 instance
+          username: ec2-user                   # Default username for Amazon Linux AMI
+          key: ${{ secrets.EC2_SSH_KEY }}      # Reference the secret containing your private SSH key
+          port: 22                             # Default SSH port
+          script: |
+            cd ~
+            ./deploy.sh
+          debug: true    
