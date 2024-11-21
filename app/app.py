@@ -7,31 +7,50 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
 from datetime import datetime
-from database_manager import DatabaseManager
+from .database_manager import DatabaseManager
 from uuid import uuid4
 from langdetect import detect
 import os
+import logging
+
+#####
+
 
 # Load environment variables
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 app = FastAPI()
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+templates_directory = os.path.join(current_directory, "templates")
+static_directory = os.path.join(current_directory, "static")
+
+app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
+app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 
 # Serve static files like CSS, JS
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Set up Jinja2 Templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=templates_directory)
 
-# Database configuration
-db_endpoint = os.environ.get("DB_ENDPOINT")
-db_user = os.environ.get("DB_USERNAME")
-db_password = os.environ.get("DB_PASSWORD")
-db_port = os.environ.get("DB_PORT")
-db_name = os.environ.get("DB_NAME")
+try:
+    # Database configuration
+    db_endpoint = os.environ.get("DB_ENDPOINT")
+    db_user = os.environ.get("DB_USERNAME")
+    db_password = os.environ.get("DB_PASSWORD")
+    db_port = os.environ.get("DB_PORT")
+    db_name = os.environ.get("DB_NAME")
+except:
+    raise KeyError("Database credentials where not loaded")
 
 # Initialize database configuration
 db_config = {
@@ -51,7 +70,7 @@ except ValueError:
 try:
     db_manager.connect()
 except ConnectionError:
-    raise ConnectionError("")
+    raise ConnectionError("Could not connect to the database")
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -71,6 +90,7 @@ class APIRequest(BaseModel):
 # Routes for rendering templates
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
+    logger.info("Home page accessed")
     return templates.TemplateResponse('index.html', {"request": request, "title": "Home"})
 
 @app.get("/airpods", response_class=HTMLResponse)
@@ -101,6 +121,7 @@ async def clear_session(request: Request):
 
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest):
+    logger.info("An api call was made")
     try:
         user_input = api_request.text
         # Detect input language
