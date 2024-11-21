@@ -1,4 +1,3 @@
- GNU nano 5.8                                     deploy.sh
 #!/bin/bash
 
 # Stop on errors
