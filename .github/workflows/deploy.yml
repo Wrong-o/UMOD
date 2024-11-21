@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+              # Use the latest version of actions/checkout (which is compatible with Node.js 16)
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3 
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.3
