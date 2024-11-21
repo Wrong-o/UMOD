@@ -26,8 +26,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 app = FastAPI()
-app.mount("/templates", StaticFiles(directory="templates"), name="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/templates", StaticFiles(directory="app/templates"), name="templates")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -35,7 +35,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 # Serve static files like CSS, JS
 
 # Set up Jinja2 Templates
-templates = Jinja2Templates(directory="templates")  # Correct directory for HTML templates
+templates = Jinja2Templates(directory="app/templates")
 try:
     # Database configuration
     db_endpoint = os.environ.get("DB_ENDPOINT")
