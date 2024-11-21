@@ -4,7 +4,7 @@
 set -e
 
 # Navigate to the app directory
-cd /UMOD
+cd ~/UMOD
 
 # Pull latest changes from main branch
 git fetch origin main
