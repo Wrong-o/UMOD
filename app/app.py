@@ -13,7 +13,7 @@ from langdetect import detect
 import os
 import logging
 
-
+##
 
 
 # Load environment variables
