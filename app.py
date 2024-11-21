@@ -13,6 +13,9 @@ from langdetect import detect
 import os
 import logging
 
+
+
+
 # Load environment variables
 load_dotenv()
 
@@ -23,16 +26,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 app = FastAPI()
+app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 
 # Serve static files like CSS, JS
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Set up Jinja2 Templates
-templates = Jinja2Templates(directory="static")
+templates = Jinja2Templates(directory="templates")  # Correct directory for HTML templates
 try:
     # Database configuration
     db_endpoint = os.environ.get("DB_ENDPOINT")
