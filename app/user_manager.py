@@ -73,6 +73,6 @@ if __name__ == "__main__":
 
     user_manager = UserManager(db_config)
     print(user_manager.register_user("porpel", "areyoutrollink"))
-    print(user_manager.login("d", "whatisyourproblem"))
+    print(user_manager.login("porpel", "areyoutrollink"))
     #print(user_manager.remove_user("alice"))
     user_manager.close_connection()

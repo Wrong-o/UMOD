@@ -12,6 +12,7 @@ from uuid import uuid4
 from langdetect import detect
 import os
 import logging
+from user_manager import UserManager
 
 #####
 
@@ -87,15 +88,38 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
+
 @app.get("/", response_class=HTMLResponse)
 async def home():
     # Redirect to the login page by default
     return RedirectResponse(url="/login")
 
 @app.get("/login", response_class=HTMLResponse)
-async def login(request: Request):
+async def login_get(request: Request):
     logger.info("Login page accessed")
     return templates.TemplateResponse('login.html', {"request": request, "title": "Login"})
+
+@app.post("/login", response_class=HTMLResponse)
+async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
+    # Initialize UserManager with db configuration
+    user_manager = UserManager(db_config)
+
+    # Attempt to login with provided credentials
+    login_result = user_manager.login(username, password)
+
+    if login_result == "Login successful":
+        # Store user info in session or redirect to a new page
+        request.session["username"] = username
+        logger.info(f"User '{username}' logged in successfully.")
+        return RedirectResponse(url="/airpods", status_code=302)
+    else:
+        # Render login page with error message
+        return templates.TemplateResponse('login.html', {
+            "request": request, 
+            "title": "Login", 
+            "error": "Invalid username or password"
+        })
+
 
 
 @app.get("/airpods", response_class=HTMLResponse)

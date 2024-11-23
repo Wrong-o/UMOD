@@ -55,7 +55,6 @@
             color: red;
             font-size: 0.875rem;
             margin-top: 0.5rem;
-            display: none;
         }
     </style>
 </head>
@@ -71,29 +70,11 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <div id="errorMessage" class="error">Invalid username or password</div>
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
             <button type="submit">Login</button>
         </form>
     </div>
-
-    <script>
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Example validation - replace with your actual authentication logic
-            if (username === "admin" && password === "password123") {
-                // Successful login
-                alert("Login successful!");
-                // Add your redirect or further processing here
-            } else {
-                // Failed login
-                errorMessage.style.display = 'block';
-            }
-        }
-    </script>
 </body>
 </html>
