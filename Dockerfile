@@ -18,6 +18,6 @@ COPY .env /.env
 
 # Expose the port your app runs on
 EXPOSE 8000
-
+#
 # Command to run the FastAPI app using Uvicorn
 CMD ["uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"]
