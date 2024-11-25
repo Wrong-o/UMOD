@@ -8,11 +8,11 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from datetime import datetime
 from app.database_manager import DatabaseManager
+from app.user_manager import UserManager
 from uuid import uuid4
 from langdetect import detect
 import os
 import logging
-from user_manager import UserManager
 
 #####
 
