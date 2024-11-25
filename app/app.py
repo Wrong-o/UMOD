@@ -14,6 +14,9 @@ from langdetect import detect
 import os
 import logging
 
+app = FastAPI(openapi_url="/openapi.json")
+
+
 #####
 
 
