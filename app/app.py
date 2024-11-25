@@ -38,6 +38,14 @@ static_directory = os.path.join(current_directory, "static")
 app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
+def log_all_files(directory, dir_name):
+    for root, _, files in os.walk(directory):
+        for file in files:
+            logger.info(f"File in {dir_name}: {os.path.join(root, file)}")
+
+log_all_files(templates_directory, "templates")
+log_all_files(static_directory, "static")
+
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 

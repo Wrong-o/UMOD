@@ -16,6 +16,11 @@ COPY . /app
 # Copy the .env file
 COPY .env /.env
 
+# Copy templates and static files
+COPY static /app/static
+COPY templates /app/templates
+
+
 # Expose the port your app runs on
 EXPOSE 8000
 ###
