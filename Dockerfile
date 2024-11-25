@@ -17,8 +17,8 @@ COPY . /app
 COPY .env /.env
 
 # Copy templates and static files
-COPY static /app/static
-COPY templates /app/templates
+COPY static /app/app/static
+COPY templates /app/app/templates
 
 
 # Expose the port your app runs on
