@@ -13,14 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # #Copy the rest of the application code
 COPY . /app
 
-# Copy the .env file
-COPY .env /.env
-
-# Copy templates and static files
-COPY app/static /app/app/static
-COPY app/templates /app/app/templates
-
-
 # Expose the port your app runs on
 EXPOSE 8000
 ###

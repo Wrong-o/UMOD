@@ -14,6 +14,8 @@ from langdetect import detect
 import os
 import logging
 
+from starlette.middleware.base import BaseHTTPMiddleware
+
 app = FastAPI(openapi_url="/openapi.json")
 
 
@@ -98,6 +100,16 @@ class FeedbackRequest(BaseModel):
 # Define request model for API input
 class APIRequest(BaseModel):
     text: str
+
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    response = await call_next(request)
+    logger.info(f"Request path: {request.url.path}, Status code: {response.status_code}")
+    return response
+
+# Add this middleware to the FastAPI app
+app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 
 
 @app.get("/", response_class=HTMLResponse)
