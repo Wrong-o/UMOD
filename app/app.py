@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
 from datetime import datetime
-from database_manager import DatabaseManager
+from app.database_manager import DatabaseManager
 from uuid import uuid4
 from langdetect import detect
 import os
