@@ -24,9 +24,6 @@ app = FastAPI(openapi_url="/openapi.json")
 app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
-
-
-
 #####
 
 
