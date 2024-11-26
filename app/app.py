@@ -15,9 +15,13 @@ import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
 
-app = FastAPI(openapi_url="/openapi.json")
 current_directory = os.path.dirname(os.path.abspath(__file__))
+templates_directory = os.path.join(current_directory, "templates")
 static_directory = os.path.join(current_directory, "static")
+
+app = FastAPI(openapi_url="/openapi.json")
+
+app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
 
