@@ -191,10 +191,13 @@ async def api_call(request: Request, api_request: APIRequest):
             request.session['chat_id'] = str(uuid4())
         logger.info(f"The chat_id was added : {request.session['chat_id']}")
         # Append user's message to the session history
-        request.session['messages'].append({
+        try:
+            request.session['messages'].append({
             "role": "user",
             "content": user_input + f"Regarding my {route_name}:"
         })
+        except Exception as e:
+            logger.info(f"Error when adding messages to session history: {e}")
 
         # Prepare messages for OpenAI API call, starting with system content
         messages = [{"role": "system", "content": file_content}]
