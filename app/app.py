@@ -213,6 +213,7 @@ async def api_call(request: Request, api_request: APIRequest):
         assistant_message_id = str(uuid4())
 
         response = chat_completion.choices[0].message.content
+        logger.info(chat_completion)
         logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
