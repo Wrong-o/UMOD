@@ -182,6 +182,7 @@ async def api_call(request: Request, api_request: APIRequest):
         # Retrieve context from the database
         try:
             file_content = db_manager.fetch_context("SELECT context FROM context WHERE product = %s", [route_name])
+            logger.info(f"The following content was fetched {file_content}")
         except ConnectionError as e:
             logger.info(f"Error fetching context: {e}")
 
