@@ -193,10 +193,12 @@ async def api_call(request: Request, api_request: APIRequest):
         # Append user's message to the session history
         try:
             if "messages" not in request.session:
-                request.session["messages"] = ({
-                    "role": "user",
-                    "content": user_input + f"Regarding my {route_name}:"
-                })
+                request.session["messages"] = [
+                    {
+                        "role": "user",
+                        "content": user_input + f"Regarding my {route_name}:"
+                    }
+                ]
             else:
                 request.session['messages'].append({
                     "role": "user",
