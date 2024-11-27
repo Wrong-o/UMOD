@@ -177,7 +177,7 @@ async def api_call(request: Request, api_request: APIRequest):
         user_input = api_request.text
         # Detect input language
         question_language = detect(user_input)
-        route_name = "unknown"  # Placeholder until request headers can be accessed properly
+        route_name = "airpods"  # Placeholder until request headers can be accessed properly
 
         # Retrieve context from the database
         try:
@@ -201,10 +201,13 @@ async def api_call(request: Request, api_request: APIRequest):
         messages.extend(request.session['messages'])
 
         # Make the API call to OpenAI with the conversation history
-        chat_completion = client.chat.completions.create(
+        try: 
+            chat_completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages
         )
+        except:
+            logger.info("api called failed")
 
         # Generate unique ID for assistant's response message
         assistant_message_id = str(uuid4())
