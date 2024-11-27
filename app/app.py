@@ -180,11 +180,10 @@ async def api_call(request: Request, api_request: APIRequest):
         route_name = "unknown"  # Placeholder until request headers can be accessed properly
 
         # Retrieve context from the database
-        file_content = db_manager.fetch_context("SELECT context FROM CONTEXT WHERE product = %s", [route_name])
-
-        # Initialize session message history if it doesn't exist
-        if 'messages' not in request.session:
-            request.session['messages'] = []
+        try:
+            file_content = db_manager.fetch_context("SELECT context FROM contect WHERE product = %s", [route_name])
+        except ConnectionError as e:
+            logger.info(f"Error fetching context: {e}")
 
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:

@@ -34,10 +34,15 @@ class DatabaseManager:
 
     def fetch_context(self, query, params=None):
         """Fetch data from the database and return as a single string."""
-        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query, params)
-            result = cursor.fetchall()
-        return str(result)
+        try:
+
+            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, params)
+                result = cursor.fetchall()
+            return str(result)
+        except Exception as e:
+            raise ConnectionError(f"Error fetching context: {e}")
+
     
     def fetch_productlist(self, table: str):
         query = f"SELECT DISTINCT product FROM {table};"
