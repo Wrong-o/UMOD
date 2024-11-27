@@ -182,7 +182,7 @@ async def api_call(request: Request, api_request: APIRequest):
         # Retrieve context from the database
         try:
             file_content = db_manager.fetch_context("SELECT context FROM context WHERE product = %s", [route_name])
-            logger.info(f"The following content was fetched {file_content}")
+            #logger.info(f"The following content was fetched {file_content}")
         except ConnectionError as e:
             logger.info(f"Error fetching context: {e}")
 
@@ -202,10 +202,12 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Make the API call to OpenAI with the conversation history
         try: 
+            logger.info("Making the call")
             chat_completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages
         )
+            logger.info("call succesfull")
         except Exception as e:
             logger.info(f"api called failed: {e}")
 
@@ -229,6 +231,7 @@ async def api_call(request: Request, api_request: APIRequest):
             INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
+        logger.info("The question was sent to the log")
         params = (
             route_name, user_input, response, request.session['chat_id'], question_language, response_language,
             assistant_message_id
@@ -237,6 +240,7 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Return JSON response
         response = response.replace("\ue61f", "&trade;")
+        logger.info(f"The response is being returned to the backend {response}")
         return {"response": response, "response_id": assistant_message_id}
 
     except Exception as e:
