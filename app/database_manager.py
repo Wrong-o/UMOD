@@ -40,8 +40,8 @@ class DatabaseManager:
                 cursor.execute(query, params)
                 result = cursor.fetchall()
             return str(result)
-        except Exception as e:
-            raise ConnectionError(f"Error fetching context: {e}")
+        except Exception:
+            raise ConnectionError
 
     
     def fetch_productlist(self, table: str):
