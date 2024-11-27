@@ -206,13 +206,14 @@ async def api_call(request: Request, api_request: APIRequest):
             model="gpt-3.5-turbo",
             messages=messages
         )
-        except:
-            logger.info("api called failed")
+        except Exception as e:
+            logger.info(f"api called failed: {e}")
 
         # Generate unique ID for assistant's response message
         assistant_message_id = str(uuid4())
 
         response = chat_completion.choices[0].message.content
+        logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
         # Append assistant's response to session history
