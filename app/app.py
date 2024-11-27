@@ -189,7 +189,7 @@ async def api_call(request: Request, api_request: APIRequest):
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
-
+        logger.info(f"The chat_id was added : {request.session['chat_id']}")
         # Append user's message to the session history
         request.session['messages'].append({
             "role": "user",
@@ -199,7 +199,7 @@ async def api_call(request: Request, api_request: APIRequest):
         # Prepare messages for OpenAI API call, starting with system content
         messages = [{"role": "system", "content": file_content}]
         messages.extend(request.session['messages'])
-
+        logger.info("messages are working")
         # Make the API call to OpenAI with the conversation history
         try: 
             logger.info("Making the call")
