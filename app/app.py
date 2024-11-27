@@ -177,7 +177,8 @@ async def api_call(request: Request, api_request: APIRequest):
         user_input = api_request.text
         # Detect input language
         question_language = detect(user_input)
-        route_name = "airpods"  # Placeholder until request headers can be accessed properly
+        path_segments = request.url.path.split("/")
+        route_name = path_segments[-1] if len(path_segments) > 1 else "default"
 
         # Retrieve context from the database
         try:
