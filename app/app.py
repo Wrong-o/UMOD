@@ -14,6 +14,7 @@ from langdetect import detect
 import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Optional
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 templates_directory = os.path.join(current_directory, "templates")
@@ -278,13 +279,10 @@ async def submit_feedback(feedback: FeedbackRequest):
 
 class FrontendErrorLog(BaseModel):
     message: str
-    stack: str = None
+    url: Optional[str] = None
+    type: Optional[str] = None
     timestamp: str
-    url: str
-    type: str = None
-    filename: str = None
-    lineno: int = None
-    colno: int = None
+    stack: Optional[str] = None
 
 
 @app.post("/log_frontend_error")
