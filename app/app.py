@@ -15,7 +15,7 @@ import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Optional
-import json
+import html
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 templates_directory = os.path.join(current_directory, "templates")
@@ -252,10 +252,10 @@ async def api_call(request: Request, api_request: APIRequest):
         db_manager.write_data(query=log_query, params=params)
 
         # Return JSON response
+        response = html.escape(response)  # Escape HTML-like content
         response = response.replace("\ue61f", "&trade;")
-        safe_response = json.dumps(response)  # Ensure JSON encoding
-        logger.info(f"The response is being returned to the backend {safe_response}")
-        return {"response": safe_response, "response_id": assistant_message_id}
+        logger.info(f"The response is being returned to the backend {response}")
+        return {"response": response, "response_id": assistant_message_id}
 
     except Exception as e:
         logger.error(f"Error: {e}")
