@@ -152,7 +152,7 @@ async def airpods(request: Request):
 async def macbook(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "MacBook"})
 
-@app.get("/yamahayzf1000", response_class=HTMLResponse)
+@app.get("/yamahayzf1000r1", response_class=HTMLResponse)
 async def yamahayzf1000(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "Yamaha yzf1000"})
 
