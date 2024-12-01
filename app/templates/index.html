@@ -4,27 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Bot</title>
-    <script>
-    window.onerror = function (message, source, lineno, colno, error) {
-    fetch('/log-frontend', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            message,
-            source,
-            lineno,
-            colno,
-            error: error ? error.stack : null,
-        }),
-    }).catch(err => console.error('Error logging frontend issue:', err));
-};
-
-
-
-
-    </script> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
@@ -309,7 +288,6 @@ main {
 
 </head>
 <body>
-
     <script>
         // Function to get product name from URL and format it
         function getProductNameFromUrl() {
@@ -338,7 +316,31 @@ main {
             }
         });
     </script>
-
+    <script>const logFrontendError = async (error) => {
+        try {
+            const response = await fetch('/log_frontend_error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: error.message || 'Unknown error',
+                    url: window.location.href, // Current page URL
+                    type: error.type || 'Error',
+                    timestamp: new Date().toISOString(),
+                    stack: error.stack || null, // Stack trace if available
+                }),
+            });
+    
+            if (!response.ok) {
+                console.error("Failed to log frontend error:", response.statusText);
+            } else {
+                console.log("Frontend error logged successfully.");
+            }
+        } catch (err) {
+            console.error("Error while sending frontend log:", err);
+        }
+    };</script>
 
 <header>
     <div class="header-content">
@@ -654,23 +656,44 @@ main {
     
     
     // Function to create and display user message
-    function createUserMessage(text) {
+    async function createUserMessage(text) {
+    try {
         const wrapper = document.createElement('div');
         wrapper.classList.add('message-wrapper', 'user');
-    
+
         const message = document.createElement('div');
         message.classList.add('message', 'user-message');
         message.textContent = text;
-    
+
         const timeDiv = document.createElement('div');
         timeDiv.classList.add('message-time');
         timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         message.appendChild(timeDiv);
-    
+
         wrapper.appendChild(message);
-        document.getElementById('chatContainer').appendChild(wrapper);
-        scrollToBottom();
+
+        const chatContainer = document.getElementById('chatContainer');
+        if (!chatContainer) {
+            throw new Error("Chat container not found");
+        }
+
+        chatContainer.appendChild(wrapper);
+
+        // Ensure scrollToBottom is defined before calling it
+        if (typeof scrollToBottom === 'function') {
+            scrollToBottom();
+        } else {
+            throw new Error("scrollToBottom function is not defined");
+        }
+    } catch (error) {
+        // Log the error to the backend
+        await logFrontendError({
+            message: error.message,
+            type: 'FrontendError',
+            stack: error.stack || null,
+        });
     }
+}
     
     // Function to auto-scroll chat container to the latest message
     function scrollToBottom() {

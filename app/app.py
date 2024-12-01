@@ -184,7 +184,7 @@ async def api_call(request: Request, api_request: APIRequest):
             file_content = db_manager.fetch_context("SELECT context FROM context WHERE product = %s", [route_name])
             #logger.info(f"The following content was fetched {file_content}")
         except ConnectionError as e:
-            logger.info(f"Error fetching context: {e}")
+            logger.error(f"Error fetching context: {e}")
 
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
@@ -205,7 +205,7 @@ async def api_call(request: Request, api_request: APIRequest):
                     "content": user_input + f"Regarding my {route_name}"
                 })
         except Exception as e:
-            logger.info(f"Error when adding messages to session history: {e}")
+            logger.error(f"Error when adding messages to session history: {e}")
 
         # Prepare messages for OpenAI API call, starting with system content
         messages = [{"role": "system", "content": file_content + "Short and to the point"}]
@@ -220,7 +220,7 @@ async def api_call(request: Request, api_request: APIRequest):
         )
             logger.info("call succesfull")
         except Exception as e:
-            logger.info(f"api called failed: {e}")
+            logger.error(f"api called failed: {e}")
 
         # Generate unique ID for assistant's response message
         assistant_message_id = str(uuid4())
@@ -255,6 +255,7 @@ async def api_call(request: Request, api_request: APIRequest):
         return {"response": response, "response_id": assistant_message_id}
 
     except Exception as e:
+        logger.error(f"Error: {e}")
         return {"error": str(e)}, 500
 
 @app.post("/submit_feedback")
@@ -274,6 +275,40 @@ async def submit_feedback(feedback: FeedbackRequest):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
+
+class FrontendErrorLog(BaseModel):
+    message: str
+    stack: str = None
+    timestamp: str
+    url: str
+    type: str = None
+    filename: str = None
+    lineno: int = None
+    colno: int = None
+
+
+@app.post("/log_frontend_error")
+async def log_frontend_error(error_log: FrontendErrorLog):
+    try:
+        # Use the existing logger to log frontend errors
+        logger.error(
+            "Frontend Error Logged: "
+            f"Message: {error_log.message}, "
+            f"URL: {error_log.url}, "
+            f"Type: {error_log.type}, "
+            f"Timestamp: {error_log.timestamp}"
+        )
+        
+        # If you want to include stack trace (optional)
+        if error_log.stack:
+            logger.error(f"Stack Trace: {error_log.stack}")
+        
+        return {"status": "error logged"}
+    
+    except Exception as e:
+        logger.error(f"Failed to process frontend error log: {str(e)}")
+        return {"status": "error logging failed"}, 500
+
 
 
 
