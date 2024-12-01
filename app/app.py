@@ -202,13 +202,13 @@ async def api_call(request: Request, api_request: APIRequest):
             else:
                 request.session['messages'].append({
                     "role": "user",
-                    "content": user_input + f"Regarding my {route_name}:"
+                    "content": user_input + f"Regarding my {route_name}"
                 })
         except Exception as e:
             logger.info(f"Error when adding messages to session history: {e}")
 
         # Prepare messages for OpenAI API call, starting with system content
-        messages = [{"role": "system", "content": file_content}]
+        messages = [{"role": "system", "content": file_content + "Short and to the point"}]
         messages.extend(request.session['messages'])
         logger.info("messages are working")
         # Make the API call to OpenAI with the conversation history
@@ -274,6 +274,15 @@ async def submit_feedback(feedback: FeedbackRequest):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
+
+
+@app.post("/log-frontend")
+async def log_frontend_issue(request: Request):
+    log_data = await request.json()
+    logger.error(f"Frontend issue: {log_data}")
+    return {"status": "logged"}
+
+
 
 if __name__ == "__main__":
     import uvicorn
