@@ -735,7 +735,14 @@ main {
                     // Pass both the response text and response_id to typeMessage
                     await typeMessage(data.response, data.response_id);
                 } catch (error) {
-                    console.error('Error:', error);
+                    // Log the error to the backend
+                    await logFrontendError({
+                        message: error.message || 'Unknown error',
+                        type: 'FrontendError',
+                        stack: error.stack || null,
+                    });
+
+                    // Handle the error gracefully
                     thinkingWrapper.remove();
                     await typeMessage('Sorry, there was an error processing your message.', null);
                 }
