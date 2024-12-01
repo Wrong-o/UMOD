@@ -133,7 +133,7 @@ async def login_post(request: Request, username: str = Form(...), password: str 
         # Store user info in session or redirect to a new page
         request.session["username"] = username
         logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/airpods", status_code=302)
+        return RedirectResponse(url="/yamahayzf1000", status_code=302)
     else:
         # Render login page with error message
         return templates.TemplateResponse('login.html', {
@@ -274,13 +274,6 @@ async def submit_feedback(feedback: FeedbackRequest):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
-
-
-@app.post("/log-frontend")
-async def log_frontend_issue(request: Request):
-    log_data = await request.json()
-    logger.error(f"Frontend issue: {log_data}")
-    return {"status": "logged"}
 
 
 
