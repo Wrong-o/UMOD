@@ -728,14 +728,14 @@ main {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text })
             });
-            console.log(data.response)
+            
             // Add more robust error checking
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
            
             const data = await response.json();
-            
+            console.log(data.response)
             // Validate data structure
             if (!data || (!data.response && !data.error)) {
                 throw new Error('Invalid response format');
