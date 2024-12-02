@@ -728,11 +728,6 @@ main {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text })
             });
-
-            // Add more robust error checking
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
            
             const data = await response.json();
             
@@ -746,7 +741,12 @@ main {
             // Handle both successful and error responses
             if (data.error) {
                 await typeMessage('Sorry, there was an error processing your message.', null);
-                console.error('API Error:', data.error);
+                await logFrontendError({
+                message: error.message || 'Unknown error',
+                type: 'FrontendError',
+                stack: error.stack || null,
+                response_id: data.response_id
+            });
             } else {
                 // Pass both the response text and response_id to typeMessage
                 await typeMessage(data.response, data.response_id);
@@ -757,6 +757,7 @@ main {
                 message: error.message || 'Unknown error',
                 type: 'FrontendError',
                 stack: error.stack || null,
+                response_id: data.response_id
             });
             
             // Handle the error gracefully

@@ -303,6 +303,7 @@ class FrontendErrorLog(BaseModel):
     type: Optional[str] = None
     timestamp: str
     stack: Optional[str] = None
+    response_id: str
 
 
 @app.post("/log_frontend_error")
@@ -314,7 +315,8 @@ async def log_frontend_error(error_log: FrontendErrorLog):
             f"Message: {error_log.message}, "
             f"URL: {error_log.url}, "
             f"Type: {error_log.type}, "
-            f"Timestamp: {error_log.timestamp}"
+            f"Timestamp: {error_log.timestamp},"
+            f"response_id: {error_log.response_id}"
         )
         
         # If you want to include stack trace (optional)
