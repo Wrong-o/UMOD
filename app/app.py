@@ -135,7 +135,7 @@ async def login_post(request: Request, username: str = Form(...), password: str 
         # Store user info in session or redirect to a new page
         request.session["username"] = username
         logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/yamahayzf1000", status_code=302)
+        return RedirectResponse(url="/yamahayzf1000r1", status_code=302)
     else:
         # Render login page with error message
         return templates.TemplateResponse('login.html', {
