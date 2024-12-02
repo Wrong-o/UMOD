@@ -8,7 +8,7 @@ import streamlit as st
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from UMOD.app.database_manager import DatabaseManager
+from app.database_manager import DatabaseManager
 
 try:
     db_manager = DatabaseManager()

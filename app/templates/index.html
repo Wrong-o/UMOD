@@ -730,12 +730,12 @@ main {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
             const data = await response.json();
             if (!data || (!data.response && !data.error)) {
                 throw new Error('Invalid response format');
             }
-
+            
+            console.log(response)
             thinkingWrapper.remove();
 
             if (data.error) {
