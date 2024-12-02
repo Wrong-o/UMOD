@@ -1,0 +1,25 @@
+UMOD stands for User Manual On Demand.
+
+
+UMOD already knows your product and its content when you start asking. This solves some common problems for the user when troubleshooting:
+1. The quickest start there is: Point your camera at the QR code and you are good to go!
+2. No need to find your model number or figure out what software was installed
+3. Lets you avoid confusing terminology
+4. Support is instant, avalible 24/7 and constantly updated
+
+
+For companies, UMOD can give your customers a quick, highly personalized and cost effective alternative to customer support.
+1. Eliminates the information gathering step of troubleshooting
+2. Valueble insight regarding customer questions and what solutions they found helpfull
+3. Due to feedback from users, UMOD can train itself to become better over time
+4. Custom information or suggestions can be added by companies retroactively
+5. Custom functions like pictures and links to specific retailers can be tailored to direct customers to relevant retailers.
+
+How does it work?
+1. User manual is uploaded to UMOD
+2. A QR-code or a link is made avalible for the customer, e.g. on the packeging or website
+3. Done. Users will now be able to user UMOD, and UMOD can start learning to increase customer experience
+
+
+Q: I want to get a demo of UMOD. How do i reach out? 
+A: Contact developer at https://www.ottorongedal.com and https://www.samuelreijers.se/

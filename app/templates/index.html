@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Bot</title>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
@@ -293,7 +292,6 @@ main {
 
 </head>
 <body>
-
     <script>
         // Function to get product name from URL and format it
         function getProductNameFromUrl() {
@@ -322,7 +320,32 @@ main {
             }
         });
     </script>
-
+    <script>const logFrontendError = async (error) => {
+        try {
+            const response = await fetch('/log_frontend_error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: error.message || 'Unknown error',
+                    url: window.location.href, // Current page URL
+                    type: error.type || 'Error',
+                    timestamp: new Date().toISOString(),
+                    stack: error.stack || null, // Stack trace if available
+                    
+                }),
+            });
+    
+            if (!response.ok) {
+                console.error("Failed to log frontend error:", response.statusText);
+            } else {
+                console.log("Frontend error logged successfully.");
+            }
+        } catch (err) {
+            console.error("Error while sending frontend log:", err);
+        }
+    };</script>
 
 <header>
     <div class="header-content">
@@ -533,33 +556,31 @@ main {
             const responseId = messageWrapper.dataset.responseId;
     // Send feedback using POST instead of GET
     fetch('/submit_feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    helpful: isPositive,
-                    response_id: responseId
-                })
-            })
-            .then(response => {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                helpful: isPositive,
+                response_id: responseId,
+            }),
+        })
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to save feedback');
                 }
                 return response.json();
             })
-        
-    
-    .then(() => {
-                   // Fade out and remove the feedback container
-           container.style.transition = 'opacity 0.3s ease';
-        container.style.opacity = '0';
-        
-        setTimeout(() => {
-            container.remove();
-        }, 300);
-        
-        // Show success message
+            .then(() => {
+                // Fade out and remove the feedback container
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = '0';
+
+                setTimeout(() => {
+                    container.remove();
+                }, 300);
+
+                // Show success message
                 const toast = document.createElement('div');
                 toast.style.cssText = `
                     position: fixed;
@@ -590,7 +611,7 @@ main {
                     }, 2000);
                 }, 100);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error saving feedback:', error);
                 button.classList.remove('selected', 'negative');
                 alert('Failed to save feedback. Please try again.');
@@ -638,23 +659,44 @@ main {
     
     
     // Function to create and display user message
-    function createUserMessage(text) {
+    async function createUserMessage(text) {
+    try {
         const wrapper = document.createElement('div');
         wrapper.classList.add('message-wrapper', 'user');
-    
+
         const message = document.createElement('div');
         message.classList.add('message', 'user-message');
         message.textContent = text;
-    
+
         const timeDiv = document.createElement('div');
         timeDiv.classList.add('message-time');
         timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         message.appendChild(timeDiv);
-    
+
         wrapper.appendChild(message);
-        document.getElementById('chatContainer').appendChild(wrapper);
-        scrollToBottom();
+
+        const chatContainer = document.getElementById('chatContainer');
+        if (!chatContainer) {
+            throw new Error("Chat container not found");
+        }
+
+        chatContainer.appendChild(wrapper);
+
+        // Ensure scrollToBottom is defined before calling it
+        if (typeof scrollToBottom === 'function') {
+            scrollToBottom();
+        } else {
+            throw new Error("scrollToBottom function is not defined");
+        }
+    } catch (error) {
+        // Log the error to the backend
+        await logFrontendError({
+            message: error.message,
+            type: 'FrontendError',
+            stack: error.stack || null,
+        });
     }
+}
     
     // Function to auto-scroll chat container to the latest message
     function scrollToBottom() {
@@ -662,46 +704,63 @@ main {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
     async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-        
-            if (text !== '') {
-                createUserMessage(text);
-                input.value = '';
-        
-                const thinkingWrapper = document.createElement('div');
-                thinkingWrapper.classList.add('message-wrapper');
-        
-                const thinkingIndicator = document.createElement('div');
-                thinkingIndicator.classList.add('thinking-indicator');
-                thinkingIndicator.textContent = 'Reading manual...';
-        
-                thinkingWrapper.appendChild(thinkingIndicator);
-        
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.appendChild(thinkingWrapper);
-                scrollToBottom();
-        
-                try {
-                    const response = await fetch('/api', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text })
-                    });
-        
-                    const data = await response.json();
-                    
-                    thinkingWrapper.remove();
-        
-                    // Pass both the response text and response_id to typeMessage
-                    await typeMessage(data.response, data.response_id);
-                } catch (error) {
-                    console.error('Error:', error);
-                    thinkingWrapper.remove();
-                    await typeMessage('Sorry, there was an error processing your message.', null);
-                }
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+   
+    if (text !== '') {
+        createUserMessage(text);
+        input.value = '';
+       
+        const thinkingWrapper = document.createElement('div');
+        thinkingWrapper.classList.add('message-wrapper');
+       
+        const thinkingIndicator = document.createElement('div');
+        thinkingIndicator.classList.add('thinking-indicator');
+        thinkingIndicator.textContent = 'Reading manual...';
+       
+        thinkingWrapper.appendChild(thinkingIndicator);
+       
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.appendChild(thinkingWrapper);
+        scrollToBottom();
+       
+        try {
+            const response = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+            if (!data || (!data.response && !data.error)) {
+                throw new Error('Invalid response format');
+            }
+
+            thinkingWrapper.remove();
+
+            if (data.error) {
+                await typeMessage('Sorry, there was an error processing your message.', null);
+                console.error('API Error:', data.error);
+            } else {
+                await typeMessage(data.response, data.response_id);
+            }
+        } catch (error) {
+            thinkingWrapper.remove();
+            await typeMessage('Sorry, there was an error processing your message.', null);
+            console.error('Fetch Error:', error);
+            await logFrontendError({
+                message: error.message || 'Unknown error',
+                type: 'FrontendError',
+                stack: error.stack || null,
+                response_id: data?.response_id || null,
+            });
         }
+            }
+}
     
     // Function to handle Enter key for sending messages
     function handleKeyPress(event) {

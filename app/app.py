@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -14,6 +15,9 @@ from langdetect import detect
 import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Optional
+import json
+import html
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 templates_directory = os.path.join(current_directory, "templates")
@@ -133,7 +137,7 @@ async def login_post(request: Request, username: str = Form(...), password: str 
         # Store user info in session or redirect to a new page
         request.session["username"] = username
         logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/airpods", status_code=302)
+        return RedirectResponse(url="/yamahayzf1000r1", status_code=302)
     else:
         # Render login page with error message
         return templates.TemplateResponse('login.html', {
@@ -148,11 +152,15 @@ async def login_post(request: Request, username: str = Form(...), password: str 
 async def airpods(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "AirPods"})
 
+@app.get("/umod", response_class=HTMLResponse)
+async def umod(request: Request):
+    return templates.TemplateResponse('index.html', {"request": request, "title": "umod"})
+
 @app.get("/macbook", response_class=HTMLResponse)
 async def macbook(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "MacBook"})
 
-@app.get("/yamahayzf1000", response_class=HTMLResponse)
+@app.get("/yamahayzf1000r1", response_class=HTMLResponse)
 async def yamahayzf1000(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "Yamaha yzf1000"})
 
@@ -184,7 +192,7 @@ async def api_call(request: Request, api_request: APIRequest):
             file_content = db_manager.fetch_context("SELECT context FROM context WHERE product = %s", [route_name])
             #logger.info(f"The following content was fetched {file_content}")
         except ConnectionError as e:
-            logger.info(f"Error fetching context: {e}")
+            logger.error(f"Error fetching context: {e}")
 
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
@@ -202,13 +210,13 @@ async def api_call(request: Request, api_request: APIRequest):
             else:
                 request.session['messages'].append({
                     "role": "user",
-                    "content": user_input + f"Regarding my {route_name}:"
+                    "content": user_input + f"Regarding my {route_name}"
                 })
         except Exception as e:
-            logger.info(f"Error when adding messages to session history: {e}")
+            logger.error(f"Error when adding messages to session history: {e}")
 
         # Prepare messages for OpenAI API call, starting with system content
-        messages = [{"role": "system", "content": file_content}]
+        messages = [{"role": "system", "content": file_content + "Short and to the point"}]
         messages.extend(request.session['messages'])
         logger.info("messages are working")
         # Make the API call to OpenAI with the conversation history
@@ -220,7 +228,7 @@ async def api_call(request: Request, api_request: APIRequest):
         )
             logger.info("call succesfull")
         except Exception as e:
-            logger.info(f"api called failed: {e}")
+            logger.error(f"api called failed: {e}")
 
         # Generate unique ID for assistant's response message
         assistant_message_id = str(uuid4())
@@ -248,14 +256,28 @@ async def api_call(request: Request, api_request: APIRequest):
             assistant_message_id
         )
         db_manager.write_data(query=log_query, params=params)
-
-        # Return JSON response
+        response = html.escape(response)  # Escape HTML-like content
         response = response.replace("\ue61f", "&trade;")
-        logger.info(f"The response is being returned to the backend {response}")
-        return {"response": response, "response_id": assistant_message_id}
+        logger.info(f"Formatted API response: \n {response}")
 
+        try:
+            logger.info(json.dumps({"response": response, "response_id": assistant_message_id}))
+            return JSONResponse(content={
+                "response": response, 
+                "response_id": assistant_message_id
+            })
+        except Exception as e:
+            logger.error(f"Error in formatting JSON response: {str(e)}")
+            return JSONResponse(
+                content={"error": "Response formatting failed", "details": str(e)},
+                status_code=500
+            )
     except Exception as e:
-        return {"error": str(e)}, 500
+        logger.error(f"Error: {e}")
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
 
 @app.post("/submit_feedback")
 async def submit_feedback(feedback: FeedbackRequest):
@@ -274,6 +296,41 @@ async def submit_feedback(feedback: FeedbackRequest):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
+
+class FrontendErrorLog(BaseModel):
+    message: str
+    url: Optional[str] = None
+    type: Optional[str] = None
+    timestamp: str
+    stack: Optional[str] = None
+    response_id: str
+
+
+@app.post("/log_frontend_error")
+async def log_frontend_error(error_log: FrontendErrorLog):
+    try:
+        # Use the existing logger to log frontend errors
+        logger.error(
+            "Frontend Error Logged: "
+            f"Message: {error_log.message}, "
+            f"URL: {error_log.url}, "
+            f"Type: {error_log.type}, "
+            f"Timestamp: {error_log.timestamp},"
+            f"response_id: {error_log.response_id}"
+        )
+        
+        # If you want to include stack trace (optional)
+        if error_log.stack:
+            logger.error(f"Stack Trace: {error_log.stack}")
+        
+        return {"status": "error logged"}
+    
+    except Exception as e:
+        logger.error(f"Failed to process frontend error log: {str(e)}")
+        return {"status": "error logging failed"}, 500
+
+
+
 
 if __name__ == "__main__":
     import uvicorn
