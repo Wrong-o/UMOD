@@ -739,7 +739,8 @@ main {
             if (!data || (!data.response && !data.error)) {
                 throw new Error('Invalid response format');
             }
-            console.log(data.response)
+            console.log(data.response);
+            console.log(data.response_id)
             
             thinkingWrapper.remove();
            
