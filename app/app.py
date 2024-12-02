@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -257,19 +258,26 @@ async def api_call(request: Request, api_request: APIRequest):
         db_manager.write_data(query=log_query, params=params)
         response = html.escape(response)  # Escape HTML-like content
         response = response.replace("\ue61f", "&trade;")
-        logger.info(f"This response is being returned from API: \n {response}")
+        logger.info(f"Formatted API response: \n {response}")
 
         try:
             logger.info(json.dumps({"response": response, "response_id": assistant_message_id}))
-            return json.dumps({"response": response, "response_id": assistant_message_id})
+            return JSONResponse(content={
+                "response": response, 
+                "response_id": assistant_message_id
+            })
         except Exception as e:
             logger.error(f"Error in formatting JSON response: {str(e)}")
-            return {"error": "Response formatting failed", "details": str(e)}
-
-
+            return JSONResponse(
+                content={"error": "Response formatting failed", "details": str(e)},
+                status_code=500
+            )
     except Exception as e:
         logger.error(f"Error: {e}")
-        return {"error": str(e)}, 500
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
 
 @app.post("/submit_feedback")
 async def submit_feedback(feedback: FeedbackRequest):

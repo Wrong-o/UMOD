@@ -329,6 +329,7 @@ main {
                     type: error.type || 'Error',
                     timestamp: new Date().toISOString(),
                     stack: error.stack || null, // Stack trace if available
+                    
                 }),
             });
     
@@ -701,53 +702,70 @@ main {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
     async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const text = input.value.trim();
-        
-            if (text !== '') {
-                createUserMessage(text);
-                input.value = '';
-        
-                const thinkingWrapper = document.createElement('div');
-                thinkingWrapper.classList.add('message-wrapper');
-        
-                const thinkingIndicator = document.createElement('div');
-                thinkingIndicator.classList.add('thinking-indicator');
-                thinkingIndicator.textContent = 'Reading manual...';
-        
-                thinkingWrapper.appendChild(thinkingIndicator);
-        
-                const chatContainer = document.getElementById('chatContainer');
-                chatContainer.appendChild(thinkingWrapper);
-                scrollToBottom();
-        
-                try {
-                    const response = await fetch('/api', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text })
-                    });
-        
-                    const data = await response.json();
-                    
-                    thinkingWrapper.remove();
-        
-                    // Pass both the response text and response_id to typeMessage
-                    await typeMessage(data.response, data.response_id);
-                } catch (error) {
-                    // Log the error to the backend
-                    await logFrontendError({
-                        message: error.message || 'Unknown error',
-                        type: 'FrontendError',
-                        stack: error.stack || null,
-                    });
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+   
+    if (text !== '') {
+        createUserMessage(text);
+        input.value = '';
+       
+        const thinkingWrapper = document.createElement('div');
+        thinkingWrapper.classList.add('message-wrapper');
+       
+        const thinkingIndicator = document.createElement('div');
+        thinkingIndicator.classList.add('thinking-indicator');
+        thinkingIndicator.textContent = 'Reading manual...';
+       
+        thinkingWrapper.appendChild(thinkingIndicator);
+       
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.appendChild(thinkingWrapper);
+        scrollToBottom();
+       
+        try {
+            const response = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
 
-                    // Handle the error gracefully
-                    thinkingWrapper.remove();
-                    await typeMessage('Sorry, there was an error processing your message.', null);
-                }
+            // Add more robust error checking
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+           
+            const data = await response.json();
+            
+            // Validate data structure
+            if (!data || (!data.response && !data.error)) {
+                throw new Error('Invalid response format');
+            }
+
+            thinkingWrapper.remove();
+           
+            // Handle both successful and error responses
+            if (data.error) {
+                await typeMessage('Sorry, there was an error processing your message.', null);
+                console.error('API Error:', data.error);
+            } else {
+                // Pass both the response text and response_id to typeMessage
+                await typeMessage(data.response, data.response_id);
+            }
+        } catch (error) {
+            // Log the error to the backend
+            await logFrontendError({
+                message: error.message || 'Unknown error',
+                type: 'FrontendError',
+                stack: error.stack || null,
+            });
+            
+            // Handle the error gracefully
+            thinkingWrapper.remove();
+            await typeMessage('Sorry, there was an error processing your message.', null);
+            console.error('Fetch Error:', error);
         }
+    }
+}
     
     // Function to handle Enter key for sending messages
     function handleKeyPress(event) {
