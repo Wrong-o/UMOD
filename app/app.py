@@ -15,6 +15,7 @@ import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Optional
+import json
 import html
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -254,11 +255,20 @@ async def api_call(request: Request, api_request: APIRequest):
             assistant_message_id
         )
         db_manager.write_data(query=log_query, params=params)
-
-        # Return JSON response
         response = html.escape(response)  # Escape HTML-like content
         response = response.replace("\ue61f", "&trade;")
-        logger.info(f"The response is being returned to the backend {response}")
+        logger.info(f"This response is being returned from API: \n {response}")
+
+        try:
+            json_response = {
+                "response": response,
+                "response_id": assistant_message_id
+            }
+            return json_response
+        except Exception as e:
+            logger.error(f"Error in formatting JSON response: {str(e)}")
+            return {"error": "Response formatting failed", "details": str(e)}
+        # Return JSON response
         return {"response": response, "response_id": assistant_message_id}
 
     except Exception as e:
