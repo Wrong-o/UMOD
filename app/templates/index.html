@@ -552,33 +552,31 @@ main {
             const responseId = messageWrapper.dataset.responseId;
     // Send feedback using POST instead of GET
     fetch('/submit_feedback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    helpful: isPositive,
-                    response_id: responseId
-                })
-            })
-            .then(response => {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                helpful: isPositive,
+                response_id: responseId,
+            }),
+        })
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to save feedback');
                 }
                 return response.json();
             })
-        
-    
-    .then(() => {
-                   // Fade out and remove the feedback container
-           container.style.transition = 'opacity 0.3s ease';
-        container.style.opacity = '0';
-        
-        setTimeout(() => {
-            container.remove();
-        }, 300);
-        
-        // Show success message
+            .then(() => {
+                // Fade out and remove the feedback container
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = '0';
+
+                setTimeout(() => {
+                    container.remove();
+                }, 300);
+
+                // Show success message
                 const toast = document.createElement('div');
                 toast.style.cssText = `
                     position: fixed;
@@ -609,7 +607,7 @@ main {
                     }, 2000);
                 }, 100);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error saving feedback:', error);
                 button.classList.remove('selected', 'negative');
                 alert('Failed to save feedback. Please try again.');
@@ -726,47 +724,38 @@ main {
             const response = await fetch('/api', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text }),
             });
-            
-            // Add more robust error checking
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-           
+
             const data = await response.json();
-            // Validate data structure
             if (!data || (!data.response && !data.error)) {
                 throw new Error('Invalid response format');
             }
-            console.log(data.response);
-            console.log(data.response_id)
-            
+
             thinkingWrapper.remove();
-           
-            // Handle both successful and error responses
+
             if (data.error) {
                 await typeMessage('Sorry, there was an error processing your message.', null);
                 console.error('API Error:', data.error);
             } else {
-                // Pass both the response text and response_id to typeMessage
                 await typeMessage(data.response, data.response_id);
             }
         } catch (error) {
-            // Log the error to the backend
+            thinkingWrapper.remove();
+            await typeMessage('Sorry, there was an error processing your message.', null);
+            console.error('Fetch Error:', error);
             await logFrontendError({
                 message: error.message || 'Unknown error',
                 type: 'FrontendError',
                 stack: error.stack || null,
-                response_id: data.response_id
+                response_id: data?.response_id || null,
             });
-            
-            // Handle the error gracefully
-            thinkingWrapper.remove();
-            await typeMessage('Sorry, there was an error processing your message.', null);
-            console.error('Fetch Error:', error);
         }
-    }
+            }
 }
     
     // Function to handle Enter key for sending messages
