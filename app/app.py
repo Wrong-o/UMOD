@@ -150,6 +150,10 @@ async def login_post(request: Request, username: str = Form(...), password: str 
 async def airpods(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "AirPods"})
 
+@app.get("/umod", response_class=HTMLResponse)
+async def umod(request: Request):
+    return templates.TemplateResponse('index.html', {"request": request, "title": "umod"})
+
 @app.get("/macbook", response_class=HTMLResponse)
 async def macbook(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "MacBook"})
