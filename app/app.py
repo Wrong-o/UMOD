@@ -260,16 +260,11 @@ async def api_call(request: Request, api_request: APIRequest):
         logger.info(f"This response is being returned from API: \n {response}")
 
         try:
-            json_response = {
-                "response": response,
-                "response_id": assistant_message_id
-            }
-            return json_response
+            return {"response": response, "response_id": assistant_message_id}
         except Exception as e:
             logger.error(f"Error in formatting JSON response: {str(e)}")
             return {"error": "Response formatting failed", "details": str(e)}
-        # Return JSON response
-        return {"response": response, "response_id": assistant_message_id}
+
 
     except Exception as e:
         logger.error(f"Error: {e}")
