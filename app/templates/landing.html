@@ -88,18 +88,13 @@
     <div class="container">
         <h2>Available Products</h2>
         <div class="product-list">
+            <!-- Iterate over products -->
+            {% for product in products %}
             <div class="product-item">
-                <span>UMOD</span>
-                <a href="/umod">View Details</a>
+                <span>{{ product.replace('_', ' ').capitalize() }}</span>
+                <a href="/{{ product }}">View Details</a>
             </div>
-            <div class="product-item">
-                <span>MacBook</span>
-                <a href="/macbook">View Details</a>
-            </div>
-            <div class="product-item">
-                <span>Yamaha YZF1000R1</span>
-                <a href="/yamahayzf1000r1">View Details</a>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </body>

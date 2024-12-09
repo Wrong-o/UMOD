@@ -147,10 +147,15 @@ async def login_post(request: Request, username: str = Form(...), password: str 
 
 @app.get("/home", response_class=HTMLResponse)
 async def landing_page(request: Request):
-    active_products = db_manager.fetch_productlist(table= "context")
+    active_products = db_manager.fetch_productlist(table="context")
     logger.info("Someone is on landing page. This is the products that we will try to display:")
     logger.info(active_products)
-    return templates.TemplateResponse('landing.html', {"request": request})
+    
+    # Extract product names from the database result
+    product_list = [row['product'] for row in active_products]
+    
+    return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
+
 
 @app.get("/umod", response_class=HTMLResponse)
 async def umod(request: Request):
