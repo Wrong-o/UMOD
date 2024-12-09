@@ -92,11 +92,12 @@
             <!-- Iterate over products -->
             {% for product in products %}
             <div class="product-item">
-                <span>{{ product.replace('_', ' ').capitalize() }}</span>
-                <a href="/{{ product }}">View Details</a>
+                <span>{{ product.display }}</span>
+                <a href="/{{ product.url }}">View Details</a>
             </div>
             {% endfor %}
         </div>
+        
     </div>
 </body>
 </html>

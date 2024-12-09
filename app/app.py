@@ -151,8 +151,11 @@ async def landing_page(request: Request):
     logger.info("Someone is on landing page. This is the products that we will try to display:")
     logger.info(active_products)
     
-    # Extract product names from the database result
-    product_list = [row['product'] for row in active_products]
+    # Prepare products with display names and normalized URLs
+    product_list = [
+        {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
+        for row in active_products
+    ]
     
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
