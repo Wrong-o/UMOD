@@ -113,6 +113,32 @@ async def log_requests(request, call_next):
 # Add this middleware to the FastAPI app
 app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 
+@app.get("/{product_name}", response_class=HTMLResponse)
+async def product_page(request: Request, product_name: str):
+    # Normalize the product name (lowercase and no spaces) to match the database entry
+    normalized_product_name = product_name.replace(" ", "").lower()
+
+    # Fetch product-specific data if necessary
+    try:
+        context = db_manager.fetch_context(
+            "SELECT context FROM context WHERE LOWER(REPLACE(product, ' ', '')) = %s",
+            [normalized_product_name]
+        )
+    except Exception as e:
+        logger.error(f"Failed to fetch context for product '{normalized_product_name}': {e}")
+        return templates.TemplateResponse('error.html', {
+            "request": request,
+            "title": "Error",
+            "message": "Product not found"
+        })
+
+    # Render the page with the product context
+    return templates.TemplateResponse('index.html', {
+        "request": request,
+        "title": product_name.capitalize(),
+        "context": context
+    })
+
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
