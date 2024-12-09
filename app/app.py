@@ -48,8 +48,8 @@ def log_all_files(directory, dir_name):
         for file in files:
             logger.info(f"File in {dir_name}: {os.path.join(root, file)}")
 
-log_all_files(templates_directory, "templates")
-log_all_files(static_directory, "static")
+#log_all_files(templates_directory, "templates") Example usage
+#log_all_files(static_directory, "static")
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -104,7 +104,6 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
-
 @app.middleware("http")
 async def log_requests(request, call_next):
     response = await call_next(request)
@@ -148,6 +147,9 @@ async def login_post(request: Request, username: str = Form(...), password: str 
 
 @app.get("/home", response_class=HTMLResponse)
 async def landing_page(request: Request):
+    active_products = db_manager.fetch_productlist(table= "context")
+    logger.info("Someone is on landing page. This is the products that we will try to display:")
+    logger.info(active_products)
     return templates.TemplateResponse('landing.html', {"request": request})
 
 @app.get("/umod", response_class=HTMLResponse)
