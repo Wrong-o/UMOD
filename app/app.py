@@ -113,6 +113,50 @@ async def log_requests(request, call_next):
 # Add this middleware to the FastAPI app
 app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 
+@app.get("/login", response_class=HTMLResponse)
+async def login_get(request: Request):
+    logger.info("Login page accessed")
+    return templates.TemplateResponse('login.html', {"request": request, "title": "Login"})
+
+@app.post("/login", response_class=HTMLResponse)
+async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
+    # Initialize UserManager with db configuration
+    user_manager = UserManager(db_config)
+
+    # Attempt to login with provided credentials
+    login_result = user_manager.login(username, password)
+
+    if login_result == "Login successful":
+        # Store user info in session or redirect to a new page
+        request.session["username"] = username
+        logger.info(f"User '{username}' logged in successfully.")
+        return RedirectResponse(url="/yamahayzf1000r1", status_code=302)
+    else:
+        # Render login page with error message
+        return templates.TemplateResponse('login.html', {
+            "request": request, 
+            "title": "Login", 
+            "error": "Invalid username or password"
+        })
+
+
+
+@app.get("/home", response_class=HTMLResponse)
+async def landing_page(request: Request):
+    active_products = db_manager.fetch_productlist(table="context")
+    logger.info("Someone is on landing page. This is the products that we will try to display:")
+    logger.info(active_products)
+    
+    # Prepare products with display names and normalized URLs
+    product_list = [
+        {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
+        for row in active_products
+    ]
+    
+    return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
+
+
+
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str):
     # Normalize the product name (lowercase and no spaces) to match the database entry
@@ -145,66 +189,7 @@ async def home():
     # Redirect to the login page by default
     return RedirectResponse(url="/login")
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_get(request: Request):
-    logger.info("Login page accessed")
-    return templates.TemplateResponse('login.html', {"request": request, "title": "Login"})
 
-@app.post("/login", response_class=HTMLResponse)
-async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
-    # Initialize UserManager with db configuration
-    user_manager = UserManager(db_config)
-
-    # Attempt to login with provided credentials
-    login_result = user_manager.login(username, password)
-
-    if login_result == "Login successful":
-        # Store user info in session or redirect to a new page
-        request.session["username"] = username
-        logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/yamahayzf1000r1", status_code=302)
-    else:
-        # Render login page with error message
-        return templates.TemplateResponse('login.html', {
-            "request": request, 
-            "title": "Login", 
-            "error": "Invalid username or password"
-        })
-
-@app.get("/home", response_class=HTMLResponse)
-async def landing_page(request: Request):
-    active_products = db_manager.fetch_productlist(table="context")
-    logger.info("Someone is on landing page. This is the products that we will try to display:")
-    logger.info(active_products)
-    
-    # Prepare products with display names and normalized URLs
-    product_list = [
-        {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
-        for row in active_products
-    ]
-    
-    return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
-
-
-@app.get("/umod", response_class=HTMLResponse)
-async def umod(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "umod"})
-
-@app.get("/macbook", response_class=HTMLResponse)
-async def macbook(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "MacBook"})
-
-@app.get("/yamahayzf1000r1", response_class=HTMLResponse)
-async def yamahayzf1000(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "Yamaha yzf1000"})
-
-@app.get("/nordica", response_class=HTMLResponse)
-async def nordica(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "Nordica Bootfitter"})
-
-@app.get("/yamahar1", response_class=HTMLResponse)
-async def yamahar1(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "yamahar1"})
 
 @app.post("/clear_session")
 async def clear_session(request: Request):
