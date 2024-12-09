@@ -146,11 +146,9 @@ async def login_post(request: Request, username: str = Form(...), password: str 
             "error": "Invalid username or password"
         })
 
-
-
-@app.get("/airpods", response_class=HTMLResponse)
-async def airpods(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "AirPods"})
+@app.get("/home", response_class=HTMLResponse)
+async def landing_page(request: Request):
+    return templates.TemplateResponse('landing.html', {"request": request})
 
 @app.get("/umod", response_class=HTMLResponse)
 async def umod(request: Request):
