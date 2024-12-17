@@ -44,12 +44,13 @@ class DatabaseManager:
             raise ConnectionError
 
     
-    def fetch_productlist(self, table: str):
+    def fetch_productlist(self):
         #Old: query = f"SELECT DISTINCT product FROM {table};"
-        #sanitized:
+        #sanitized:i
         query = """
         SELECT DISTINCT product FROM %s;
         """
+        table = "context"
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (table,))
             result = cursor.fetchall()
