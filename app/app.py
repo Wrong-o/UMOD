@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,7 +15,7 @@ from langdetect import detect
 import os
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
-from typing import Optional
+from typing import Any, Optional
 import json
 import html
 
@@ -48,8 +48,13 @@ def log_all_files(directory, dir_name):
         for file in files:
             logger.info(f"File in {dir_name}: {os.path.join(root, file)}")
 
-#log_all_files(templates_directory, "templates") Example usage
-#log_all_files(static_directory, "static")
+"""
+uncomment this to get the files in docker logs
+log_all_files(templates_directory, "templates") Example usage
+log_all_files(static_directory, "static")
+
+
+"""
 
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
@@ -67,7 +72,7 @@ try:
     db_port = os.environ.get("DB_PORT")
     db_name = os.environ.get("DB_NAME")
 except:
-    raise KeyError("Database credentials where not loaded")
+    raise KeyError("Database credentials where not loaded, .env broken or missing")
 
 # Initialize database configuration
 db_config = {
@@ -89,12 +94,10 @@ try:
 except ConnectionError:
     raise ConnectionError("Could not connect to the database")
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
-# Price function definition for use with OpenAI
-def get_price(product_name, prices_table):
-    return prices_table.get(product_name, "Price not found")
-
+try:
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+except:
+    raise KeyError("API_KEY not loaded, .env missing or broken.")
 # Define request model for feedback
 class FeedbackRequest(BaseModel):
     helpful: bool
@@ -104,45 +107,58 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
+
+#
 @app.middleware("http")
 async def log_requests(request, call_next):
     response = await call_next(request)
     logger.info(f"Request path: {request.url.path}, Status code: {response.status_code}")
     return response
 
-# Add this middleware to the FastAPI app
-app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
+# app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 
-@app.get("/login", response_class=HTMLResponse)
+
+#get login: loggs that login was accessed, render login.html
+@app.get("/login", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def login_get(request: Request):
+    """
+    Logs the page access and return the login templates
+    """
     logger.info("Login page accessed")
     return templates.TemplateResponse('login.html', {"request": request, "title": "Login"})
 
-@app.post("/login", response_class=HTMLResponse)
+@app.post("/login", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
-    # Initialize UserManager with db configuration
+    """
+    Gets username and password from the frontend.
+    Initialises UserManager with the db_config.
+    Attempts a login
+    If successfull, redirects to /home
+    """
     user_manager = UserManager(db_config)
-
-    # Attempt to login with provided credentials
+    
     login_result = user_manager.login(username, password)
 
     if login_result == "Login successful":
         # Store user info in session or redirect to a new page
         request.session["username"] = username
         logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/yamahayzf1000r1", status_code=302)
+        return RedirectResponse(url="/home", status_code=302)
     else:
         # Render login page with error message
         return templates.TemplateResponse('login.html', {
             "request": request, 
             "title": "Login", 
-            "error": "Invalid username or password"
+            "error": "Invalid credentials"
         })
 
 
 
-@app.get("/home", response_class=HTMLResponse)
+@app.get("/home", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def landing_page(request: Request):
+    """
+    Gets the product list and displays the avalible UMOD variants
+    """
     active_products = db_manager.fetch_productlist(table="context")
     logger.info("Someone is on landing page. This is the products that we will try to display:")
     logger.info(active_products)
@@ -159,10 +175,16 @@ async def landing_page(request: Request):
 
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str):
-    # Normalize the product name (lowercase and no spaces) to match the database entry
+    """
+    When user tries to access a specific product:
+    1. Normalize the input by removing spaces and uppercase
+    2. Attmempt to fetch the correct UMOD variant
+    3. Return error page if not avalible
+    4. Render the correct page if product is avalible
+    """
+    
     normalized_product_name = product_name.replace(" ", "").lower()
 
-    # Fetch product-specific data if necessary
     try:
         context = db_manager.fetch_context(
             "SELECT context FROM context WHERE LOWER(REPLACE(product, ' ', '')) = %s",
@@ -176,7 +198,6 @@ async def product_page(request: Request, product_name: str):
             "message": "Product not found"
         })
 
-    # Render the page with the product context
     return templates.TemplateResponse('index.html', {
         "request": request,
         "title": product_name.capitalize(),
@@ -186,19 +207,28 @@ async def product_page(request: Request, product_name: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    # Redirect to the login page by default
+    """
+    This function is called when root url is accessed
+    """
     return RedirectResponse(url="/login")
 
 
 
 @app.post("/clear_session")
 async def clear_session(request: Request):
+    """
+    Clears the sessions, removes the previous messages from context
+    **NOT IMPLEMENTED YET**
+    """
     if "messages" in request.session:
         request.session.pop("messages")
     return {"status": "session cleared"}
 
-@app.post("/api")
+@app.post("/send_question")
 async def api_call(request: Request, api_request: APIRequest):
+    """
+    This function takes the input 
+    """
     logger.info("An api call was made")
     try:
         user_input = api_request.text

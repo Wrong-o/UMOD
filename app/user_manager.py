@@ -26,8 +26,12 @@ class UserManager:
             self.conn.rollback()
             return "Username already exists"
 
-    def login(self, username, password):
-        # Hash password
+    def login(self, username: str, password: str):
+        """
+        Tries to login with the username and password
+        Password is stored in sha256 format
+        Returns login successful Invalid credentials
+        """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         # Query to check if the user exists and validate the password
@@ -39,10 +43,8 @@ class UserManager:
             stored_password = result[0]
             if stored_password == hashed_password:
                 return "Login successful"
-            else:
-                return "Incorrect password"
         else:
-            return "Invalid username"
+            return "Invalid credentials"
 
     def remove_user(self, username):
         # Delete user from the users table

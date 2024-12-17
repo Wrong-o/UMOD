@@ -76,7 +76,3 @@ class DatabaseManager:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (product, manual))
             self.connection.commit()
-
-
-
-    
