@@ -48,11 +48,10 @@ class DatabaseManager:
         #Old: query = f"SELECT DISTINCT product FROM {table};"
         #sanitized:i
         query = """
-        SELECT DISTINCT product FROM %s;
+        SELECT DISTINCT product FROM context;
         """
-        table = "context"
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query, (table,))
+            cursor.execute(query,)
             result = cursor.fetchall()
         return result
     
