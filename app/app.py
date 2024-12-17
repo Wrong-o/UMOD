@@ -34,12 +34,14 @@ app.mount("/static", StaticFiles(directory=static_directory), name="static")
 # Load environment variables
 load_dotenv()
 
-# Configure logging
+# Configure logging: Read through docker logs
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+#Initialize the application
 app = FastAPI()
 
 
@@ -55,26 +57,26 @@ log_all_files(static_directory, "static")
 
 
 """
-
 # Adding Session Middleware for session storage
 app.add_middleware(SessionMiddleware, secret_key=os.urandom(24))
 
-# Serve static files like CSS, JS
+
 
 # Set up Jinja2 Templates
 templates = Jinja2Templates(directory=templates_directory)
 
-try:
-    # Database configuration
-    db_endpoint = os.environ.get("DB_ENDPOINT")
-    db_user = os.environ.get("DB_USERNAME")
-    db_password = os.environ.get("DB_PASSWORD")
-    db_port = os.environ.get("DB_PORT")
-    db_name = os.environ.get("DB_NAME")
-except:
-    raise KeyError("Database credentials where not loaded, .env broken or missing")
+db_endpoint = os.environ.get("DB_ENDPOINT")
+db_user = os.environ.get("DB_USERNAME")
+db_password = os.environ.get("DB_PASSWORD")
+db_port = os.environ.get("DB_PORT")
+db_name = os.environ.get("DB_NAME")
 
-# Initialize database configuration
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# Validate environment variables
+if not all([db_endpoint, db_user, db_password, db_port, db_name, client]):
+    raise KeyError("Database credentials were not loaded. Missing or broken .env file.")
+
+
 db_config = {
     'host': db_endpoint,
     'dbname': db_name,
@@ -94,10 +96,6 @@ try:
 except ConnectionError:
     raise ConnectionError("Could not connect to the database")
 
-try:
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-except:
-    raise KeyError("API_KEY not loaded, .env missing or broken.")
 # Define request model for feedback
 class FeedbackRequest(BaseModel):
     helpful: bool
@@ -107,16 +105,11 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
-
-#
 @app.middleware("http")
 async def log_requests(request, call_next):
     response = await call_next(request)
     logger.info(f"Request path: {request.url.path}, Status code: {response.status_code}")
     return response
-
-# app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
-
 
 #get login: loggs that login was accessed, render login.html
 @app.get("/login", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
@@ -227,7 +220,10 @@ async def clear_session(request: Request):
 @app.post("/send_question")
 async def api_call(request: Request, api_request: APIRequest):
     """
-    This function takes the input 
+    Returns information in JSON format
+    This user sends all messages from the session to the API and returns the api response.
+    It logs all responses using db_manager.
+    Logs along the way to help debugging 
     """
     logger.info("An api call was made")
     try:
@@ -239,7 +235,6 @@ async def api_call(request: Request, api_request: APIRequest):
         # Retrieve context from the database
         try:
             file_content = db_manager.fetch_context("SELECT context FROM context WHERE product = %s", [route_name])
-            #logger.info(f"The following content was fetched {file_content}")
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
 
@@ -297,7 +292,7 @@ async def api_call(request: Request, api_request: APIRequest):
         # Log the interaction in the database
         log_query = """
             INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
         """
         logger.info("The question was sent to the log")
         params = (
@@ -330,6 +325,10 @@ async def api_call(request: Request, api_request: APIRequest):
 
 @app.post("/submit_feedback")
 async def submit_feedback(feedback: FeedbackRequest):
+    """
+    Submits binary feedback from the user and appends its to the database with responses.
+
+    """
     try:
         feedback_query = """
             UPDATE questionlog
@@ -346,6 +345,8 @@ async def submit_feedback(feedback: FeedbackRequest):
     except Exception as e:
         return {"status": "error", "message": str(e)}, 500
 
+
+# FrontendErrorLog is a temporary, made for troubleshooting displaying issues due to formatting.
 class FrontendErrorLog(BaseModel):
     message: str
     url: Optional[str] = None
@@ -357,6 +358,10 @@ class FrontendErrorLog(BaseModel):
 
 @app.post("/log_frontend_error")
 async def log_frontend_error(error_log: FrontendErrorLog):
+    """
+    Front end sends frontend errormessages
+    Error is logged and can be viewed in docker logs
+    """
     try:
         # Use the existing logger to log frontend errors
         logger.error(
@@ -368,7 +373,6 @@ async def log_frontend_error(error_log: FrontendErrorLog):
             f"response_id: {error_log.response_id}"
         )
         
-        # If you want to include stack trace (optional)
         if error_log.stack:
             logger.error(f"Stack Trace: {error_log.stack}")
         
