@@ -152,10 +152,10 @@ async def landing_page(request: Request):
     """
     Gets the product list and displays the avalible UMOD variants
     """
-    active_products = db_manager.fetch_productlist(table=context)
+    active_products = db_manager.fetch_productlist()
     logger.info("Someone is on landing page. This is the products that we will try to display:")
     logger.info(active_products)
-    
+    #
     # Prepare products with display names and normalized URLs
     product_list = [
         {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
