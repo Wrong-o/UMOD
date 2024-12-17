@@ -139,6 +139,7 @@ async def login_post(request: Request, username: str = Form(...), password: str 
         return RedirectResponse(url="/home", status_code=302)
     else:
         # Render login page with error message
+
         return templates.TemplateResponse('login.html', {
             "request": request, 
             "title": "Login", 
@@ -161,7 +162,7 @@ async def landing_page(request: Request):
         {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
         for row in active_products
     ]
-    
+
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
@@ -217,7 +218,7 @@ async def clear_session(request: Request):
         request.session.pop("messages")
     return {"status": "session cleared"}
 
-@app.post("/send_question")
+@app.post("/api")
 async def api_call(request: Request, api_request: APIRequest):
     """
     Returns information in JSON format
