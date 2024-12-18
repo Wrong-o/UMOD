@@ -159,7 +159,7 @@ async def landing_page(request: Request):
     #
     # Prepare products with display names and normalized URLs
     product_list = [
-        {"display": row['product'], "url": row['product'].replace(" ", "").lower()}
+        {"display": row['product_name'], "url": row['product_name'].replace(" ", "").lower()}
         for row in active_products
     ]
 
