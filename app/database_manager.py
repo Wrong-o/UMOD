@@ -32,7 +32,7 @@ class DatabaseManager:
         if self.connection:
             self.connection.close()
 
-    def fetch_context(self, query, params=None):
+    def fetch_manual(self, query, params=None):
         """Fetch data from the database and return as a single string."""
         try:
 
@@ -48,7 +48,7 @@ class DatabaseManager:
         #Old: query = f"SELECT DISTINCT product FROM {table};"
         #sanitized:i
         query = """
-        SELECT DISTINCT product FROM context;
+        SELECT DISTINCT product_name FROM product_table;
         """
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query,)
@@ -84,7 +84,7 @@ class DatabaseManager:
             self.connection.commit()
     
     def add_manual(self, product: str, manual: str):
-        query = "INSERT INTO context (product, context) VALUES (%s, %s)"
+        query = "INSERT INTO product_table (product_name, manual) VALUES (%s, %s)"
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (product, manual))
             self.connection.commit()
