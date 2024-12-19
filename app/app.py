@@ -132,7 +132,7 @@ async def login_post(request: Request, username: str = Form(...), password: str 
     If successfull, redirects to /home
     """
     user_manager = UserManager(db_config)
-    
+
     try:
         login_result = user_manager.login(username, password)
         if login_result == "Login successful":
@@ -170,6 +170,7 @@ async def landing_page(request: Request):
     except Exception as e:
         logger.error("When accessing the homepage, the following error occured: ")
         logger.error(e)
+        raise HTTPException(detail=f"Error: {e} when getting product list")
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
