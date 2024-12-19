@@ -46,7 +46,7 @@ class DatabaseManager:
         conn = self.get_connection()
         try:
 
-            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, params)
                 result = cursor.fetchall()
             return str(result)
@@ -65,7 +65,7 @@ class DatabaseManager:
         """
         conn = self.get_connection()
         try:
-            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query,)
                 result = cursor.fetchall()
         except psycopg2.DatabaseError:
@@ -82,7 +82,7 @@ class DatabaseManager:
         """
         conn = self.get_connection()
         try:
-            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, (product, language))
                 result = cursor.fetchall()
                 return result
@@ -100,7 +100,7 @@ class DatabaseManager:
         """
         conn = self.get_connection()
         try:
-            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, (table,))
                 result = cursor.fetchall()
                 return result
@@ -113,7 +113,7 @@ class DatabaseManager:
         """Write data to the database."""
         conn = self.get_connection()
         try:
-            with self.connection.cursor() as cursor:
+            with conn.cursor() as cursor:
                 cursor.execute(query, params)
                 self.connection.commit()
         except psycopg2.IntegrityError:
@@ -125,7 +125,7 @@ class DatabaseManager:
         query = "INSERT INTO product_table (product_name, manual) VALUES (%s, %s)"
         conn = self.get_connection()
         try:
-            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, (product, manual))
                 self.connection.commit()
         except Exception:
