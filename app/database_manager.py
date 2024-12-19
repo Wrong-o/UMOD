@@ -50,9 +50,12 @@ class DatabaseManager:
         query = """
         SELECT DISTINCT product_name FROM product_table;
         """
-        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query,)
-            result = cursor.fetchall()
+        try:
+            with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query,)
+                result = cursor.fetchall()
+        except psycopg2.DatabaseError:
+            raise psycopg2.DatabaseError("The product list was not fetched. Check logs for more info.")
         return result
     
     def fetch_questions_by_language(self, product: str, language: str):
@@ -79,9 +82,12 @@ class DatabaseManager:
 
     def write_data(self, query, params=None):
         """Write data to the database."""   
-        with self.connection.cursor() as cursor:
-            cursor.execute(query, params)
-            self.connection.commit()
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(query, params)
+                self.connection.commit()
+        except psycopg2.IntegrityError:
+            raise psycopg2.IntegrityError("Product already exists")
     
     def add_manual(self, product: str, manual: str):
         query = "INSERT INTO product_table (product_name, manual) VALUES (%s, %s)"

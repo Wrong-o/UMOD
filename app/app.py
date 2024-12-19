@@ -184,7 +184,7 @@ async def product_page(request: Request, product_name: str):
 
     try:
         context = db_manager.fetch_manual(
-            "SELECT manual FROM product_table WHERE LOWER(REPLACE(product, ' ', '')) = %s",
+            "SELECT manual FROM product_table WHERE LOWER(REPLACE(product_name, ' ', '')) = %s",
             [normalized_product_name]
         )
     except Exception as e:
