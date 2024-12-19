@@ -153,16 +153,19 @@ async def landing_page(request: Request):
     """
     Gets the product list and displays the avalible UMOD variants
     """
-    active_products = db_manager.fetch_productlist()
-    logger.info("Someone is on landing page. This is the products that we will try to display:")
-    logger.info(active_products)
+    try:
+        active_products = db_manager.fetch_productlist()
+        logger.info("Someone is on landing page. This is the products that we will try to display:")
+        logger.info(active_products)
     #
     # Prepare products with display names and normalized URLs
-    product_list = [
-        {"display": row['product_name'], "url": row['product_name'].replace(" ", "").lower()}
-        for row in active_products
-    ]
-
+        product_list = [
+            {"display": row['product_name'], "url": row['product_name'].replace(" ", "").lower()}
+            for row in active_products
+        ]
+    except Exception as e:
+        logger.error("When accessing the homepage, the following error occured: ")
+        logger.error(e)
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
