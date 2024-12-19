@@ -39,11 +39,14 @@ class DatabaseManager:
         self.pool.putconn(conn)
 
     def fetch_manual(self, params: str):
-        """Fetch data from the database and return as a single string."""
+        """
+        Fetch data from the database and return as a single string.
+        """
         query ="""SELECT manual FROM product_table 
-        WHERE LOWER(REPLACE(product_name, ' ', '')) = %s",
+        WHERE LOWER(REPLACE(product_name, ' ', '')) = %s,
         """
         conn = self.get_connection()
+        
         try:
 
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
