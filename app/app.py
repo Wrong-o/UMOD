@@ -188,10 +188,8 @@ async def product_page(request: Request, product_name: str):
     normalized_product_name = product_name.replace(" ", "").lower()
 
     try:
-        context = db_manager.fetch_manual(
-            "SELECT manual FROM product_table WHERE LOWER(REPLACE(product_name, ' ', '')) = %s",
-            [normalized_product_name]
-        )
+        context = db_manager.fetch_manual([normalized_product_name])
+        
     except ConnectionError as e:
         logger.error(f"Failed to fetch context for product '{normalized_product_name}': {e}")
         
