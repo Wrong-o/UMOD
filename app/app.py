@@ -91,14 +91,6 @@ try:
 except ValueError:
     raise ValueError("Construction of the db_manager failed.")
 
-try:
-    db_manager.connect()
-except ConnectionError:
-    raise ConnectionError("Could not connect to the database")
-try:
-    db_manager.close()
-except ConnectionError:
-    raise ConnectionError("Closing connection to databse not working properly")
 # Define request model for feedback
 class FeedbackRequest(BaseModel):
     helpful: bool
@@ -189,7 +181,7 @@ async def product_page(request: Request, product_name: str):
 
     try:
         context = db_manager.fetch_manual([normalized_product_name])
-        
+
     except ConnectionError as e:
         logger.error(f"Failed to fetch context for product '{normalized_product_name}': {e}")
         
