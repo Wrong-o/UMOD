@@ -14,10 +14,10 @@ from uuid import uuid4
 from langdetect import detect
 import os
 import logging
-from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Any, Optional
 import json
 import html
+from app.exceptions import UserNotFoundError
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 templates_directory = os.path.join(current_directory, "templates")
@@ -74,7 +74,7 @@ db_name = os.environ.get("DB_NAME")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # Validate environment variables
 if not all([db_endpoint, db_user, db_password, db_port, db_name, client]):
-    raise KeyError("Database credentials were not loaded. Missing or broken .env file.")
+    raise ImportError("Database credentials were not loaded. Missing or broken .env file.")
 
 
 db_config = {
@@ -95,7 +95,10 @@ try:
     db_manager.connect()
 except ConnectionError:
     raise ConnectionError("Could not connect to the database")
-
+try:
+    db_manager.close()
+except ConnectionError:
+    raise ConnectionError("Closing connection to databse not working properly")
 # Define request model for feedback
 class FeedbackRequest(BaseModel):
     helpful: bool
@@ -130,23 +133,24 @@ async def login_post(request: Request, username: str = Form(...), password: str 
     """
     user_manager = UserManager(db_config)
     
-    login_result = user_manager.login(username, password)
-
-    if login_result == "Login successful":
+    try:
+        login_result = user_manager.login(username, password)
+        if login_result == "Login successful":
         # Store user info in session or redirect to a new page
-        request.session["username"] = username
-        logger.info(f"User '{username}' logged in successfully.")
-        return RedirectResponse(url="/home", status_code=302)
-    else:
+            request.session["username"] = username
+            logger.info(f"User '{username}' logged in successfully.")
+            return RedirectResponse(url="/home", status_code=302)
         # Render login page with error message
-
-        return templates.TemplateResponse('login.html', {
+    except UserNotFoundError:
+        raise HTTPException(detail="User was not found", status_code= 404)
+    """
+         return templates.TemplateResponse('login.html', {
             "request": request, 
             "title": "Login", 
             "error": "Invalid credentials"
         })
-
-
+    """
+   
 
 @app.get("/home", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def landing_page(request: Request):
@@ -187,13 +191,19 @@ async def product_page(request: Request, product_name: str):
             "SELECT manual FROM product_table WHERE LOWER(REPLACE(product_name, ' ', '')) = %s",
             [normalized_product_name]
         )
-    except Exception as e:
+    except ConnectionError as e:
         logger.error(f"Failed to fetch context for product '{normalized_product_name}': {e}")
+        
+        """
         return templates.TemplateResponse('error.html', {
             "request": request,
             "title": "Error",
             "message": "Product not found"
         })
+        
+        """
+         
+        raise HTTPException(detail=f"Manual for {normalized_product_name} not found", status_code=404)
 
     return templates.TemplateResponse('index.html', {
         "request": request,
