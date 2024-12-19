@@ -162,7 +162,7 @@ async def landing_page(request: Request):
     except Exception as e:
         logger.error("When accessing the homepage, the following error occured: ")
         logger.error(e)
-        raise HTTPException(detail=f"Error: {e} when getting product list")
+        raise HTTPException(detail=f"Error: {e} when getting product list", status_code=  204)
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
