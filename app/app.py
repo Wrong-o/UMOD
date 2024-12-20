@@ -195,7 +195,8 @@ async def product_page(request: Request, product_name: str):
     
     try:
         db_result = db_manager.fetch_manual([route_name])
-        manual = db_result[0]["manual"] 
+        manual = db_result[0]["manual"]
+        logger.info(manual, db_result[0]["image_url"]) 
     except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
     return templates.TemplateResponse('index.html', {
