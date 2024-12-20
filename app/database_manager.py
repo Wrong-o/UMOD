@@ -132,6 +132,35 @@ class DatabaseManager:
         finally:
             self.put_connection(conn)
 
+    def log_question(self, log_entry):
+        """
+        Write data to the database.
+        """
+        query = """
+            INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
+
+
+        """
+        params = (
+        log_entry.product,
+        log_entry.question,
+        log_entry.response,
+        log_entry.chat_id,
+        log_entry.question_language,
+        log_entry.response_language,
+        log_entry.response_id
+        )
+
+        conn = self.get_connection()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute(query, params)
+                conn.commit()
+        except psycopg2.IntegrityError:
+            raise psycopg2.IntegrityError("Product already exists")
+        finally:
+            self.put_connection(conn)
     def add_manual(self, product: str, manual: str):
         query = "INSERT INTO product_table (product_name, manual) VALUES (%s, %s)"
         conn = self.get_connection()

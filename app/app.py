@@ -16,8 +16,9 @@ import os
 import logging
 from typing import Any, Optional
 import json
-import html
 from app.exceptions import UserNotFoundError
+from app.schemas import QuestionLogSchema
+
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 templates_directory = os.path.join(current_directory, "templates")
@@ -296,17 +297,31 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Log the interaction in the database
         try:
-            log_query = """
-                INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s);
             """
+            log_query = """
+                #INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
+                #VALUES (%s, %s, %s, %s, %s, %s, %s);
+            """
+            
             params = (
                 route_name, user_input, response, request.session['chat_id'], question_language, response_language,
                 assistant_message_id
             )
             logger.info(route_name, user_input, response, request.session['chat_id'], question_language, response_language, assistant_message_id)
             db_manager.write_data(query=log_query, params=params)
-            
+            """
+
+            log_query = QuestionLogSchema(
+                product=route_name,
+                question=user_input,
+                response=response,
+                chat_id=request.session['chat_id'],
+                question_language=question_language,
+                response_language=response_language,
+                response_id=assistant_message_id
+
+            )
+            db_manager.log_question(log_query) 
             logger.info("The question was sent to the log")
             logger.info(f"{response} is respones")
             response = response.replace("\ue61f", "&trade;")
