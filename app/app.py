@@ -307,7 +307,6 @@ async def api_call(request: Request, api_request: APIRequest):
             )
             db_manager.write_data(query=log_query, params=params)
             logger.info("data written")
-            response = html.escape(response)  # Escape HTML-like content
             logger.info(f"{response} is respones")
             response = response.replace("\ue61f", "&trade;")
             logger.info(f"Formatted API response: \n {response}")
