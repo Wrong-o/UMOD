@@ -178,10 +178,10 @@ async def product_page(request: Request, product_name: str):
     4. Render the correct page if product is avalible
     """
     
-    normalized_product_name = product_name.replace(" ", "").lower()
+    route_name = request.headers.get("referer", "").split('/')[-1]
 
     try:
-        db_manager.check_product_in_productlist(normalized_product_name)
+        db_manager.check_product_in_productlist(route_name)
     except HTTPException as e:
         raise HTTPException(detail=f"{e}", status_code=404)
         """
@@ -192,9 +192,10 @@ async def product_page(request: Request, product_name: str):
         })
         
         """
-         
+    
     try:
-        manual = db_manager.fetch_manual([normalized_product_name])
+        db_result = db_manager.fetch_manual([route_name])
+        manual = db_result[0]["manual"] 
     except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
     return templates.TemplateResponse('index.html', {
@@ -246,8 +247,8 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Retrieve context from the database
         try:
-            manual = db_manager.fetch_manual([route_name])
-            logger.info(manual)
+            db_result = db_manager.fetch_manual([route_name])
+            manual = db_result[0]["manual"]  
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
 
