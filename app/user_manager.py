@@ -2,6 +2,7 @@ import hashlib
 import psycopg2
 import os
 from dotenv import load_dotenv
+from exceptions import UserNotFoundError
 
 load_dotenv()
 
@@ -13,6 +14,7 @@ class UserManager:
         self.cursor = self.conn.cursor()
 
     def register_user(self, username, password):
+        
         # Hash password
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
@@ -44,8 +46,7 @@ class UserManager:
             if stored_password == hashed_password:
                 return "Login successful"
         else:
-            return "Invalid credentials"
-
+            raise UserNotFoundError
     def remove_user(self, username):
         # Delete user from the users table
         delete_query = "DELETE FROM users WHERE username = %s;"
