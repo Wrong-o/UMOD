@@ -43,7 +43,7 @@ class DatabaseManager:
         """
         Fetch data from the database and return as a single string.
         """
-        query ="""SELECT p.manual, i.image_url, pl.purhcase_link
+        query ="""SELECT p.manual, i.image_url, pl.purchase_link
             FROM product_table p
             LEFT JOIN image_table i
                 ON p.product_id = i.product_id
