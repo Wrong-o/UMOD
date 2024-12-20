@@ -178,12 +178,10 @@ async def product_page(request: Request, product_name: str):
     4. Render the correct page if product is avalible
     """
     
-    route_name = request.headers.get("referer", "").split('/')[-1]
+    route_name = product_name.lower().replace(" ","")
 
     try:
         db_manager.check_product_in_productlist(route_name)
-    except HTTPException as e:
-        raise HTTPException(detail=f"{e}", status_code=404)
         """
         return templates.TemplateResponse('error.html', {
             "request": request,
@@ -193,10 +191,12 @@ async def product_page(request: Request, product_name: str):
         
         """
     
-    try:
-        db_result = db_manager.fetch_manual([route_name])
-        manual = db_result[0]["manual"]
-        logger.info(manual, db_result[0]["image_url"]) 
+        db_result = db_manager.fetch_manual(route_name)
+        if not db_result:
+            raise HTTPException(status_code=404, detail="Product not found")
+        manual = db_result["manual"]
+        purchase_link = db_result.get('purchase_link')
+        logger.info(manual, purchase_link)
     except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
     return templates.TemplateResponse('index.html', {
