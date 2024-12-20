@@ -39,7 +39,7 @@ class DatabaseManager:
         """Puts the connection back into the pool."""
         self.pool.putconn(conn)
 
-    def fetch_manual(self, params: str):
+    def fetch_manual(self, product: str):
         """
         Fetch data from the database and return as a single string.
         """
@@ -56,7 +56,7 @@ class DatabaseManager:
         try:
 
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(query, (params,))
+                cursor.execute(query, (product,))
                 result = cursor.fetchall()
                 
             return result

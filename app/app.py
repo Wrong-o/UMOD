@@ -247,7 +247,7 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Retrieve context from the database
         try:
-            db_result = db_manager.fetch_manual([route_name])
+            db_result = db_manager.fetch_manual(route_name)
             manual = db_result[0]["manual"]  
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
