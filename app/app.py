@@ -247,9 +247,10 @@ async def api_call(request: Request, api_request: APIRequest):
         # Retrieve context from the database
         try:
             manual = db_manager.fetch_manual([route_name])
+            logger.info(manual)
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
-        logger.info(manual) 
+
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
@@ -294,7 +295,7 @@ async def api_call(request: Request, api_request: APIRequest):
         logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
-        # Append message history
+        # Append assistant's response to session history
         request.session['messages'].append({
             "role": "assistant",
             "content": response,
