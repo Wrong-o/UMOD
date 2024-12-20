@@ -46,8 +46,9 @@ class DatabaseManager:
         query ="""SELECT p.manual, i.image_url, pl.purhcase_link
             FROM product_table p
             LEFT JOIN image_table i
-                ON p.product = i.product_id
-            LEFT JOIN purchase_link_table_id
+                ON p.product_id = i.product_id
+            LEFT JOIN purchase_link_table pl
+                ON p.product_id = pl.product_id
             WHERE LOWER(REPLACE(product_name, ' ', '')) = %s;
         """
         conn = self.get_connection()
