@@ -79,11 +79,13 @@ class DatabaseManager:
         return result
         
     def check_product_in_productlist(self, product: str):
-        list = self.fetch_productlist()
-        if product in list:
-            return 0
+        products = self.fetch_productlist()
+        if any(row['product_name'] == product for row in products):
+            return 0        
         else:
             raise HTTPException(f"{product} not in list: {list}")
+        
+
     def fetch_questions_by_language(self, product: str, language: str):
         query = """
         SELECT question FROM questionlog
