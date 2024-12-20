@@ -43,7 +43,7 @@ class DatabaseManager:
         Fetch data from the database and return as a single string.
         """
         query ="""SELECT manual FROM product_table 
-        WHERE LOWER(REPLACE(product_name, ' ', '')) = %s,
+        WHERE LOWER(REPLACE(product_name, ' ', '')) = %s;
         """
         conn = self.get_connection()
         
