@@ -3,6 +3,7 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
 from psycopg2 import pool
+from fastapi import HTTPException
 
 class DatabaseManager:
     def __init__(self):
@@ -77,7 +78,12 @@ class DatabaseManager:
             self.put_connection(conn)
         return result
         
-    
+    def check_product_in_productlist(self, product: str):
+        list = self.fetch_productlist()
+        if product in list:
+            return 0
+        else:
+            raise HTTPException(f"{product} not in list: {list}")
     def fetch_questions_by_language(self, product: str, language: str):
         query = """
         SELECT question FROM questionlog

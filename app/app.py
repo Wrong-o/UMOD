@@ -180,11 +180,9 @@ async def product_page(request: Request, product_name: str):
     normalized_product_name = product_name.replace(" ", "").lower()
 
     try:
-        context = db_manager.fetch_manual([normalized_product_name])
-
-    except ConnectionError as e:
-        logger.error(f"Failed to fetch context for product '{normalized_product_name}': {e}")
-        
+        db_manager.check_product_in_productlist(normalized_product_name)
+    except HTTPException as e:
+        raise HTTPException(detail=f"{e}", status_code=204)
         """
         return templates.TemplateResponse('error.html', {
             "request": request,
@@ -194,12 +192,11 @@ async def product_page(request: Request, product_name: str):
         
         """
          
-        raise HTTPException(detail=f"Manual for {normalized_product_name} not found", status_code=204)
 
     return templates.TemplateResponse('index.html', {
         "request": request,
         "title": product_name.capitalize(),
-        "context": context
+        "context": None
     })
 
 
@@ -239,7 +236,7 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Retrieve context from the database
         try:
-            file_content = db_manager.fetch_manual("SELECT manual FROM product_table WHERE product_name = %s", [route_name])
+            file_content = db_manager.fetch_manual([route_name])
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
 
