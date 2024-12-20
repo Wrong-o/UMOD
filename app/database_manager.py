@@ -56,7 +56,7 @@ class DatabaseManager:
         try:
 
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                cursor.execute(query, params)
+                cursor.execute(query, (params,))
                 result = cursor.fetchall()
                 
             return result
