@@ -43,8 +43,12 @@ class DatabaseManager:
         """
         Fetch data from the database and return as a single string.
         """
-        query ="""SELECT manual FROM product_table 
-        WHERE LOWER(REPLACE(product_name, ' ', '')) = %s;
+        query ="""SELECT p.manual, i.image_url, pl.purhcase_link
+            FROM product_table p
+            LEFT JOIN image_table i
+                ON p.product = i product_id
+            LEFT JOIN purchase_link_table_id
+            WHERE LOWER(REPLACE(product_name, ' ', '')) = %s;
         """
         conn = self.get_connection()
         
@@ -121,14 +125,16 @@ class DatabaseManager:
             self.put_connection(conn)
 
     def write_data(self, query, params=None):
-        """Write data to the database."""
+        """
+        Generic, outdated. Leaving to help troubleshoot.
+        """
         conn = self.get_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query, params)
                 conn.commit()
         except psycopg2.IntegrityError:
-            raise psycopg2.IntegrityError("Product already exists")
+            raise psycopg2.IntegrityError("This function does not exist.")
         finally:
             self.put_connection(conn)
 
@@ -161,6 +167,8 @@ class DatabaseManager:
             raise psycopg2.IntegrityError("Product already exists")
         finally:
             self.put_connection(conn)
+
+    
     def add_manual(self, product: str, manual: str):
         query = "INSERT INTO product_table (product_name, manual) VALUES (%s, %s)"
         conn = self.get_connection()
@@ -172,3 +180,14 @@ class DatabaseManager:
             pass
         finally:
             self.put_connection(conn)
+
+    def fetch_link(self, product: str):
+        query = "SELECT link FROM product_links WHERE product_name = %s"
+        conn = self.get_connection()
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, (product,))
+                result = cursor.fetchall()
+                return result
+        except Exception:
+            return "no link found"

@@ -212,7 +212,6 @@ async def home():
     return RedirectResponse(url="/login")
 
 
-
 @app.post("/clear_session")
 async def clear_session(request: Request):
     """
@@ -222,7 +221,14 @@ async def clear_session(request: Request):
     if "messages" in request.session:
         request.session.pop("messages")
     return {"status": "session cleared"}
-
+"""
+async def fetch_purchase_link(product: str):
+    query = "SELECT link FROM product_links WHERE product_name = %s"
+    result = db_manager.fetch_data(query, (product,))
+    if not result:
+        return "Can't find link"
+    return result[0]['link']
+"""
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest):
     """
@@ -243,7 +249,7 @@ async def api_call(request: Request, api_request: APIRequest):
             manual = db_manager.fetch_manual([route_name])
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
-
+        logger.info(manual) 
         # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
@@ -265,11 +271,11 @@ async def api_call(request: Request, api_request: APIRequest):
         except Exception as e:
             logger.error(f"Error when adding messages to session history: {e}")
 
-        # Prepare messages for OpenAI API call, starting with system content
+        #API call, starting with manual content
         messages = [{"role": "system", "content": manual + "Short and to the point"}]
         messages.extend(request.session['messages'])
         logger.info("messages are working")
-        # Make the API call to OpenAI with the conversation history
+        # call to OpenAI with the conversation history
         try: 
             logger.info("Making the call")
             chat_completion = client.chat.completions.create(
@@ -288,7 +294,7 @@ async def api_call(request: Request, api_request: APIRequest):
         logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
-        # Append assistant's response to session history
+        # Append message history
         request.session['messages'].append({
             "role": "assistant",
             "content": response,
