@@ -195,8 +195,6 @@ async def product_page(request: Request, product_name: str):
         if not db_result:
             raise HTTPException(status_code=404, detail="Product not found")
         manual = db_result["manual"]
-        purchase_link = db_result.get('purchase_link')
-        logger.info(manual, purchase_link)
     except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
     return templates.TemplateResponse('index.html', {

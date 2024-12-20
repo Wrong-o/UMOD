@@ -59,7 +59,7 @@ class DatabaseManager:
                 cursor.execute(query, params)
                 result = cursor.fetchall()
                 
-            return str(result)
+            return result
         except Exception as e:
             raise ConnectionError(f"db_manager: manual not found: {e}")
         
