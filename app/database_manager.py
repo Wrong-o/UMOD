@@ -126,7 +126,7 @@ class DatabaseManager:
         try:
             with conn.cursor() as cursor:
                 cursor.execute(query, params)
-                cursor.commit()
+                conn.commit()
         except psycopg2.IntegrityError:
             raise psycopg2.IntegrityError("Product already exists")
         finally:
