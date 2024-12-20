@@ -295,20 +295,22 @@ async def api_call(request: Request, api_request: APIRequest):
         })
 
         # Log the interaction in the database
-        log_query = """
-            INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s);
-        """
-        logger.info("The question was sent to the log")
-        params = (
-            route_name, user_input, response, request.session['chat_id'], question_language, response_language,
-            assistant_message_id
-        )
-        db_manager.write_data(query=log_query, params=params)
-        response = html.escape(response)  # Escape HTML-like content
-        response = response.replace("\ue61f", "&trade;")
-        logger.info(f"Formatted API response: \n {response}")
-
+        try:
+            log_query = """
+                INSERT INTO questionlog (product, question, response, chat_id, q_lang, r_lang, response_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s);
+            """
+            logger.info("The question was sent to the log")
+            params = (
+                route_name, user_input, response, request.session['chat_id'], question_language, response_language,
+                assistant_message_id
+            )
+            db_manager.write_data(query=log_query, params=params)
+            response = html.escape(response)  # Escape HTML-like content
+            response = response.replace("\ue61f", "&trade;")
+            logger.info(f"Formatted API response: \n {response}")
+        except Exception as e:
+            raise Exception(f"{e}")
         try:
             logger.info(json.dumps({"response": response, "response_id": assistant_message_id}))
             return JSONResponse(content={
