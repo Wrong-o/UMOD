@@ -182,7 +182,7 @@ async def product_page(request: Request, product_name: str):
     try:
         db_manager.check_product_in_productlist(normalized_product_name)
     except HTTPException as e:
-        raise HTTPException(detail=f"{e}", status_code=204)
+        raise HTTPException(detail=f"{e}", status_code=404)
         """
         return templates.TemplateResponse('error.html', {
             "request": request,
@@ -192,11 +192,14 @@ async def product_page(request: Request, product_name: str):
         
         """
          
-
+    try:
+        manual = db_manager.fetch_manual([normalized_product_name])
+    except ConnectionError as e:
+            logger.error(f"Error fetching context: {e}")
     return templates.TemplateResponse('index.html', {
         "request": request,
         "title": product_name.capitalize(),
-        "context": None
+        "context": manual
     })
 
 
@@ -236,7 +239,7 @@ async def api_call(request: Request, api_request: APIRequest):
 
         # Retrieve context from the database
         try:
-            file_content = db_manager.fetch_manual([route_name])
+            manual = db_manager.fetch_manual([route_name])
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
 
@@ -262,7 +265,7 @@ async def api_call(request: Request, api_request: APIRequest):
             logger.error(f"Error when adding messages to session history: {e}")
 
         # Prepare messages for OpenAI API call, starting with system content
-        messages = [{"role": "system", "content": file_content + "Short and to the point"}]
+        messages = [{"role": "system", "content": manual + "Short and to the point"}]
         messages.extend(request.session['messages'])
         logger.info("messages are working")
         # Make the API call to OpenAI with the conversation history
