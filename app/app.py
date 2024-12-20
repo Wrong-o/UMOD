@@ -194,7 +194,7 @@ async def product_page(request: Request, product_name: str):
         
         """
          
-        raise HTTPException(detail=f"Manual for {normalized_product_name} not found", status_code=404)
+        raise HTTPException(detail=f"Manual for {normalized_product_name} not found", status_code=204)
 
     return templates.TemplateResponse('index.html', {
         "request": request,

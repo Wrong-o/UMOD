@@ -2,7 +2,7 @@ import hashlib
 import psycopg2
 import os
 from dotenv import load_dotenv
-from exceptions import UserNotFoundError
+from app.exceptions import UserNotFoundError
 
 load_dotenv()
 
