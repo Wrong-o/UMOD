@@ -46,7 +46,7 @@ class DatabaseManager:
         query ="""SELECT p.manual, i.image_url, pl.purhcase_link
             FROM product_table p
             LEFT JOIN image_table i
-                ON p.product = i product_id
+                ON p.product = i.product_id
             LEFT JOIN purchase_link_table_id
             WHERE LOWER(REPLACE(product_name, ' ', '')) = %s;
         """
@@ -57,6 +57,7 @@ class DatabaseManager:
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query, params)
                 result = cursor.fetchall()
+                
             return str(result)
         except Exception as e:
             raise ConnectionError(f"db_manager: manual not found: {e}")
