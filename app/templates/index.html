@@ -532,25 +532,11 @@
         const decodedText = decodeHtmlEntities(text); // Decode HTML entities
         
         //Testing image displaying
-        const imageExtension = ['.jpg', '.jpeg', '.png', '.gig'];
-        const imageUrl = imageExtensions.some(ext => decodedText.includes(ext)) ? decodedText.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif)/)[0] : null;
-          if (imageUrl) {
-            const imgElement = document.createElement('img');
-            imgElement.src = imageUrl;
-            imgElement.alt = "Image";
-            imgElement.style.maxWidth = '100%';
-            img.style.borderRadius = '10px';
-            imgElement.style.marginTop = '10px';
-            
-            textElement.textContent = decodedText.replace(imageUrl, '');
-            messageDiv.appendChild(imgElement);
-          } else {
         for (let i = 0; i < decodedText.length; i++) {
             currentText += decodedText[i];
             textElement.textContent = currentText;
             await sleep(typingSpeed);
             scrollToBottom();
-        }
       }
 
         cursor.style.display = 'none';
