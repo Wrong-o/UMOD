@@ -165,8 +165,8 @@ class DatabaseManager:
             with conn.cursor() as cursor:
                 cursor.execute(query, params)
                 conn.commit()
-        except psycopg2.IntegrityError:
-            raise psycopg2.IntegrityError("Product already exists")
+        except psycopg2.DatabaseError:
+            raise psycopg2.DatabaseError
         finally:
             self.put_connection(conn)
 

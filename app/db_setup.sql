@@ -24,13 +24,13 @@ CREATE TABLE saved_products (
 -- images
 CREATE TABLE image_table (
     image_id SERIAL PRIMARY KEY,
-    products_id INT REFERENCES product_table(product_id),
+    product_id INT REFERENCES product_table(product_id),
     image_url TEXT NOT NULL
 );
 
 -- purchase links
-CREATE TABLE purchase_link (
+CREATE TABLE purchase_link_table (
     purchase_link_id SERIAL PRIMARY KEY,
-    products_id INT REFERENCES product_table(product_id),
-    link TEXT NOT NULL
+    product_id INT REFERENCES product_table(product_id),
+    purchase_link TEXT NOT NULL
 );

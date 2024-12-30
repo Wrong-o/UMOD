@@ -129,11 +129,11 @@ async def login_post(request: Request, username: str = Form(...), password: str 
     try:
         login_result = user_manager.login(username, password)
         if login_result == "Login successful":
-        # Store user info in session or redirect to a new page
+        #Store user info in session or redirect to a new page
             request.session["username"] = username
             logger.info(f"User '{username}' logged in successfully.")
             return RedirectResponse(url="/home", status_code=302)
-        # Render login page with error message
+        #Render login page with error message
     except UserNotFoundError:
         raise HTTPException(detail="User was not found", status_code= 404)
     """
@@ -241,22 +241,18 @@ async def api_call(request: Request, api_request: APIRequest):
     logger.info("An api call was made")
     try:
         user_input = api_request.text
-        # Detect input language
         question_language = detect(user_input)
         route_name = request.headers.get("referer", "").split('/')[-1]
 
-        # Retrieve context from the database
         try:
             db_result = db_manager.fetch_manual(route_name)
             manual = db_result[0]["manual"]  
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
 
-        # Assign or retrieve the chat_id for the session
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
         logger.info(f"The chat_id was added : {request.session['chat_id']}")
-        # Append user's message to the session history
         try:
             if "messages" not in request.session:
                 request.session["messages"] = [
@@ -288,7 +284,7 @@ async def api_call(request: Request, api_request: APIRequest):
         except Exception as e:
             logger.error(f"api called failed: {e}")
 
-        # Generate unique ID for assistant's response message
+        #Generate unique ID 
         assistant_message_id = str(uuid4())
 
         response = chat_completion.choices[0].message.content
@@ -296,14 +292,14 @@ async def api_call(request: Request, api_request: APIRequest):
         logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
-        # Append assistant's response to session history
+        #Append response to history
         request.session['messages'].append({
             "role": "assistant",
             "content": response,
             "message_id": assistant_message_id
         })
 
-        # Log the interaction in the database
+        #Log the interaction in the database
         try:
             """
             log_query = """
