@@ -483,12 +483,19 @@ async def self_upload_api_call(request: Request, api_request: APIRequest, user_u
             "content": response,
             "message_id": assistant_message_id
         })
+        return JSONResponse(content={
+            "response": response, 
+            "response_id": assistant_message_id
+            })
+    
+    
     except Exception as e:
         logger.error(f"Error: {e}")
         return JSONResponse(
             content={"error": str(e)},
             status_code=500
         )
+    
 
 
 if __name__ == "__main__":
