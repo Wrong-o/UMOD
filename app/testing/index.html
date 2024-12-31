@@ -3,49 +3,780 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Viewer</title>
+    <title>Chat Bot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    min-height: 100vh;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    height: 70px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.bot-icon {
+    width: 35px;
+    height: 35px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.header-text {
+    text-align: left;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.status {
+    font-size: 0.8rem;
+    color: #4CAF50;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+main {
+    margin-top: 70px;
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 70px);
+    position: relative;
+}
+
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    width: 100%;
+    max-height: 2000vh;
+    margin-bottom: 90px;
+    box-sizing: border-box;
+    overflow-y: scroll; /* Gör det möjligt att scrolla vertikalt */
+    scrollbar-width: none; /* Döljer scrollbar på Firefox */
+    
+}
+
+
+.input-container {
+    width: 100%;
+    background-color: #f5f5f5;
+    padding: 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 98;
+}
+
+
+.input-box {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 25px;
+    padding: 8px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.input-box:focus-within {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.text-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px;
+    font-size: 16px;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+}
+
+.send-button {
+    background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.send-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.message-wrapper {
+    display: flex;
+    margin: 8px 0;
+    width: 100%;
+    position: relative;
+        }
+
+        .message-wrapper.user {
+    justify-content: flex-end;
+    width: 100%;
+}
+
+
+
+.message {
+    padding: 15px 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+.user-message {
+    background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.bot-message {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    color: #333;
+    border-bottom-left-radius: 5px;
+}
+
+.message-time {
+    font-size: 11px;
+    margin-top: 5px;
+    opacity: 0.7;
+    text-align: right;
+    font-family: 'Poppins', sans-serif;
+}
+
+.umod-signature {
+    position: fixed;
+    bottom: 130px;
+    right: 20px;
+    font-size: 12px;
+    color: #666;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 97;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+
+.feedback-container {
+    position: absolute;
+    right: 200px; /* Öka avståndet lite */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    background-color: rgba(255,255,255,0.8); /* För bättre synlighet */
+    padding: 0px;
+    border-radius: 5px;
+}
+
+        .message-wrapper:not(.user):hover .feedback-container {
+            opacity: 1;
+        }
+
+        .feedback-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.2em;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+        .feedback-button:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .feedback-button.selected {
+            opacity: 1;
+            color: #4CAF50;
+        }
+
+        .feedback-button.selected.negative {
+            color: #f44336;
+        }
+
+
+
+
+
+    </style>
+
 </head>
 <body>
-    <h1>JSON Data Viewer</h1>
-    <div id="content"></div>
+    <script>
+        // Function to get product name from URL and format it
+        function getProductNameFromUrl() {
+            const path = window.location.pathname;
+            const productName = path.split('/').pop(); // Get last part of URL
+            return productName
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/(\d+)/g, ' $1')
+                .split(/(?=[A-Z0-9])/)
+                .join(' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        // Combine both window.onload functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update header text
+            const productName = getProductNameFromUrl();
+            console.log("Product Name:", productName); // För debugging
+            const headerTitle = document.querySelector('.header-text h1');
+            if (headerTitle) {
+                headerTitle.textContent = productName;
+            } else {
+                console.error("Header title element not found");
+            }
+        });
+    </script>
+    <script>const logFrontendError = async (error) => {
+        try {
+            const response = await fetch('/log_frontend_error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: error.message || 'Unknown error',
+                    url: window.location.href, // Current page URL
+                    type: error.type || 'Error',
+                    timestamp: new Date().toISOString(),
+                    stack: error.stack || null, // Stack trace if available
+                    
+                }),
+            });
+    
+            if (!response.ok) {
+                console.error("Failed to log frontend error:", response.statusText);
+            } else {
+                console.log("Frontend error logged successfully.");
+            }
+        } catch (err) {
+            console.error("Error while sending frontend log:", err);
+        }
+    };</script>
+
+<header>
+    <div class="header-content">
+        <div class="bot-icon">
+            ⚙️
+        </div>
+        <div class="header-text">
+            <h1 id="productTitle">Loading...</h1>
+            <div class="status">
+                <span class="status-dot"></span>
+                Online
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="chat-container" id="chatContainer">
+        <!-- Messages will be added here dynamically -->
+    </div>
+
+    <div class="umod-signature">
+        Powered by UMOD
+    </div>
+</main>
+
+
+        
+    <div class="input-container">
+        <div class="input-box">
+            <input type="text" id="userInput" class="text-input" placeholder="Type here..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()" class="send-button">Send</button>
+        </div>
+    </div>
+
 
     <script>
-        // Fetch JSON file and display content
-        fetch('data.json') // Replace 'data.json' with the path to your JSON file
-            .then(response => {
+        // Move your existing window.onload into a separate function
+        window.onload = function() {
+            // Update header text again to ensure it's set
+            const productName = getProductNameFromUrl();
+            document.querySelector('.header-text h1').textContent = productName;
+            
+            // Your existing welcome message
+            typeWelcomeMessage('Welcome! How can I help you today?');
+        }
+    </script>
+
+    
+
+<script>
+    // Utility function for delay
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function typeWelcomeMessage(text, responseId) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('message-wrapper');
+            
+            // Store the response_id as a data attribute
+            wrapper.dataset.responseId = responseId;
+        
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot-message');
+        
+            const textElement = document.createElement('div');
+            textElement.style.whiteSpace = 'pre-line';
+        
+            const feedbackContainer = document.createElement('div');
+            feedbackContainer.classList.add('feedback-container');
+            feedbackContainer.style.display = 'flex';
+        
+            const thumbsUp = document.createElement('button');
+            thumbsUp.classList.add('feedback-button');
+            thumbsUp.innerHTML = '👍';
+            thumbsUp.style.fontSize = '16px';
+            thumbsUp.onclick = function() {
+                handleFeedback(this, true);
+            };
+        
+            const thumbsDown = document.createElement('button');
+            thumbsDown.classList.add('feedback-button');
+            thumbsDown.innerHTML = '👎';
+            thumbsDown.style.fontSize = '16px';
+            thumbsDown.onclick = function() {
+                handleFeedback(this, false);
+            };
+        
+            const cursor = document.createElement('span');
+            cursor.classList.add('cursor');
+            cursor.textContent = '|';
+        
+            messageDiv.appendChild(textElement);
+            messageDiv.appendChild(cursor);
+        
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('message-time');
+            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageDiv.appendChild(timeDiv);
+        
+            wrapper.appendChild(messageDiv);
+            wrapper.appendChild(feedbackContainer);
+            
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.appendChild(wrapper);
+            scrollToBottom();
+        
+            const typingSpeed = 10;
+            let currentText = '';
+            for (let i = 0; i < text.length; i++) {
+                currentText += text[i];
+                textElement.textContent = currentText;
+                await sleep(typingSpeed);
+                scrollToBottom();
+            }
+        
+            cursor.style.display = 'none';
+        }
+
+// Function to decode HTML entities
+function decodeHtmlEntities(text) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+}
+
+async function typeMessage(text, responseId) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message-wrapper');
+    
+    // Store the response_id as a data attribute
+    wrapper.dataset.responseId = responseId;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'bot-message');
+
+    const textElement = document.createElement('div');
+    textElement.style.whiteSpace = 'pre-line';
+
+    const feedbackContainer = document.createElement('div');
+    feedbackContainer.classList.add('feedback-container');
+    feedbackContainer.style.display = 'flex';
+
+    const thumbsUp = document.createElement('button');
+    thumbsUp.classList.add('feedback-button');
+    thumbsUp.innerHTML = '👍';
+    thumbsUp.style.fontSize = '16px';
+    thumbsUp.onclick = function () {
+        handleFeedback(this, true);
+    };
+
+    const thumbsDown = document.createElement('button');
+    thumbsDown.classList.add('feedback-button');
+    thumbsDown.innerHTML = '👎';
+    thumbsDown.style.fontSize = '16px';
+    thumbsDown.onclick = function () {
+        handleFeedback(this, false);
+    };
+
+    feedbackContainer.appendChild(thumbsUp);
+    feedbackContainer.appendChild(thumbsDown);
+
+    const cursor = document.createElement('span');
+    cursor.classList.add('cursor');
+    cursor.textContent = '|';
+
+    messageDiv.appendChild(textElement);
+    messageDiv.appendChild(cursor);
+
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('message-time');
+    timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageDiv.appendChild(timeDiv);
+
+    wrapper.appendChild(messageDiv);
+    wrapper.appendChild(feedbackContainer);
+
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.appendChild(wrapper);
+    scrollToBottom();
+
+    const typingSpeed = 10;
+    let currentText = '';
+    const decodedText = decodeHtmlEntities(text); // Decode HTML entities
+    
+    //Testing image displaying
+    for (let i = 0; i < decodedText.length; i++) {
+        currentText += decodedText[i];
+        textElement.textContent = currentText;
+        await sleep(typingSpeed);
+        scrollToBottom();
+  }
+
+    cursor.style.display = 'none';
+}
+
+    
+    function handleFeedback(button, isPositive) {
+            const container = button.parentElement;
+            const buttons = container.getElementsByClassName('feedback-button');
+            
+            // Remove selected class from all buttons
+            Array.from(buttons).forEach(btn => {
+                btn.classList.remove('selected', 'negative');
+            });
+            
+            // Add selected class to clicked button
+            button.classList.add('selected');
+            if (!isPositive) {
+                button.classList.add('negative');
+            }
+
+            // Get the response_id from the message wrapper
+            const messageWrapper = button.closest('.message-wrapper');
+            const responseId = messageWrapper.dataset.responseId;
+    // Send feedback using POST instead of GET
+    fetch('/submit_feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                helpful: isPositive,
+                response_id: responseId,
+            }),
+        })
+            .then((response) => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Failed to save feedback');
                 }
                 return response.json();
             })
-            .then(data => {
-                const contentDiv = document.getElementById('content');
+            .then(() => {
+                // Fade out and remove the feedback container
+                container.style.transition = 'opacity 0.3s ease';
+                container.style.opacity = '0';
 
-                // Create elements for the response text
-                const responseText = document.createElement('p');
-                responseText.textContent = `Response: ${data.response}`;
-                contentDiv.appendChild(responseText);
+                setTimeout(() => {
+                    container.remove();
+                }, 300);
 
-                // Check and display images if the list is not empty
-                if (Array.isArray(data.images) && data.images.length > 0) {
-                    data.images.forEach(imageUrl => {
-                        const image = document.createElement('img');
-                        image.src = imageUrl;
-                        image.alt = 'Image';
-                        image.style.maxWidth = '100%';
-                        image.style.margin = '10px 0';
-                        contentDiv.appendChild(image);
-                    });
-                } else {
-                    const noImagesText = document.createElement('p');
-                    noImagesText.textContent = 'No images available.';
-                    contentDiv.appendChild(noImagesText);
-                }
+                // Show success message
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 100px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    z-index: 1000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    font-family: 'Poppins', sans-serif;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                `;
+                toast.textContent = 'Thank you for your feedback!';
+                document.body.appendChild(toast);
+
+                // Show and hide toast
+                setTimeout(() => {
+                    toast.style.opacity = '1';
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        setTimeout(() => {
+                            toast.remove();
+                        }, 300);
+                    }, 2000);
+                }, 100);
             })
-            .catch(error => {
-                console.error('Error fetching JSON:', error);
+            .catch((error) => {
+                console.error('Error saving feedback:', error);
+                button.classList.remove('selected', 'negative');
+                alert('Failed to save feedback. Please try again.');
             });
+        }
+
+
+        then(() => {
+            // Show success message
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #4CAF50;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                font-family: 'Poppins', sans-serif;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            `;
+            toast.textContent = 'Thank you for your feedback!';
+            document.body.appendChild(toast);
+    
+            // Show and hide toast
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 2000);
+            }, 100);
+        })
+        .catch(error => {
+            console.error('Error saving feedback:', error);
+            button.classList.remove('selected', 'negative');
+            alert('Failed to save feedback. Please try again.');
+        });
+    
+    
+    // Function to create and display user message
+    async function createUserMessage(text) {
+    try {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('message-wrapper', 'user');
+
+        const message = document.createElement('div');
+        message.classList.add('message', 'user-message');
+        message.textContent = text;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        message.appendChild(timeDiv);
+
+        wrapper.appendChild(message);
+
+        const chatContainer = document.getElementById('chatContainer');
+        if (!chatContainer) {
+            throw new Error("Chat container not found");
+        }
+
+        chatContainer.appendChild(wrapper);
+
+        // Ensure scrollToBottom is defined before calling it
+        if (typeof scrollToBottom === 'function') {
+            scrollToBottom();
+        } else {
+            throw new Error("scrollToBottom function is not defined");
+        }
+    } catch (error) {
+        // Log the error to the backend
+        await logFrontendError({
+            message: error.message,
+            type: 'FrontendError',
+            stack: error.stack || null,
+        });
+    }
+}
+    
+    // Function to auto-scroll chat container to the latest message
+    function scrollToBottom() {
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+
+    if (text !== '') {
+        createUserMessage(text);
+        input.value = '';
+    
+        const thinkingWrapper = document.createElement('div');
+        thinkingWrapper.classList.add('message-wrapper');
+    
+        const thinkingIndicator = document.createElement('div');
+        thinkingIndicator.classList.add('thinking-indicator');
+        thinkingIndicator.textContent = 'Reading manual...';
+    
+        thinkingWrapper.appendChild(thinkingIndicator);
+    
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.appendChild(thinkingWrapper);
+        scrollToBottom();
+    
+        try {
+            const response = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (!data || (!data.response && !data.error)) {
+                throw new Error('Invalid response format');
+            }
+            
+            console.log(response)
+            thinkingWrapper.remove();
+
+            if (data.error) {
+                await typeMessage('Sorry, there was an error processing your message.', null);
+                console.error('API Error:', data.error);
+            } else {
+                await typeMessage(data.response, data.response_id);
+            }
+        } catch (error) {
+            thinkingWrapper.remove();
+            await typeMessage('Sorry, there was an error processing your message.', null);
+            console.error('Fetch Error:', error);
+            await logFrontendError({
+                message: error.message || 'Unknown error',
+                type: 'FrontendError',
+                stack: error.stack || null,
+                response_id: data?.response_id || null,
+            });
+        }
+            }
+}
+    
+    // Function to handle Enter key for sending messages
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+    
     </script>
+
 </body>
 </html>
-

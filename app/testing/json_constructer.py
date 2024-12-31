@@ -4,8 +4,8 @@ data = {
     "response": "this is text",
     "response_id": "82822",
     "images": [
-        # "https://cdn0.iconfinder.com/data/icons/education-134/288/exam-1024.png",
-        # "http://images.clipartpanda.com/testing-clipart-orange-test-icon-Download-Royalty-free-Vector-File-EPS-141875.jpg",
+        "https://cdn0.iconfinder.com/data/icons/education-134/288/exam-1024.png",
+        "http://images.clipartpanda.com/testing-clipart-orange-test-icon-Download-Royalty-free-Vector-File-EPS-141875.jpg",
     ],
 }
 
