@@ -77,6 +77,44 @@
         .product-item a:hover {
             text-decoration: underline;
         }
+    
+        .cta-button {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .cta-button a {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button a:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cta-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .cta-container h2 {
+            margin-bottom: 20px;
+            color: #2b2f3a;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +123,13 @@
         <p>Select a product to start chatting with the user manual</p>
         <p>The manuals are added by the developers, click on the umod chat if you have quesitons.</p>
     </header>
+
+    <div class="cta-container">
+        <h2>Try UMOD with your own Manual!</h2>
+        <div class="cta-button">
+            <a href="/upload">Upload Here</a>
+        </div>
+    </div>
 
     <div class="container">
         <h2>Available Products</h2>
