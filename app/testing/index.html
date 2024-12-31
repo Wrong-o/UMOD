@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Viewer</title>
+</head>
+<body>
+    <h1>JSON Data Viewer</h1>
+    <div id="content"></div>
+
+    <script>
+        // Fetch JSON file and display content
+        fetch('data.json') // Replace 'data.json' with the path to your JSON file
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const contentDiv = document.getElementById('content');
+
+                // Create elements for the response text
+                const responseText = document.createElement('p');
+                responseText.textContent = `Response: ${data.response}`;
+                contentDiv.appendChild(responseText);
+
+                // Check and display images if the list is not empty
+                if (Array.isArray(data.images) && data.images.length > 0) {
+                    data.images.forEach(imageUrl => {
+                        const image = document.createElement('img');
+                        image.src = imageUrl;
+                        image.alt = 'Image';
+                        image.style.maxWidth = '100%';
+                        image.style.margin = '10px 0';
+                        contentDiv.appendChild(image);
+                    });
+                } else {
+                    const noImagesText = document.createElement('p');
+                    noImagesText.textContent = 'No images available.';
+                    contentDiv.appendChild(noImagesText);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching JSON:', error);
+            });
+    </script>
+</body>
+</html>
+
