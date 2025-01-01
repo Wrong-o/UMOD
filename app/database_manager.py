@@ -193,3 +193,34 @@ class DatabaseManager:
                 return result
         except Exception:
             return "no link found"
+        finally:
+            self.put_connection(conn)
+    
+    def get_images(self, product: str):
+        """
+        This funciton returns image urls and descriptions for the products.
+        """
+        query = """SELECT 
+                i.image_url, 
+                i.image_description1
+            FROM 
+                product_table p
+            JOIN 
+                image_table i 
+            ON 
+                p.product_id = i.product_id
+            WHERE 
+                p.product_name = %s';"""
+        conn = self.get_connection()
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+                cursor.execute(query, (product,))
+                result = cursor.fetchall()
+                # Convert the result to a dictionary
+                images_dict = {row['image_description']: row['image_url'] for row in result}
+                return images_dict
+        except Exception as e:
+            print(f"Error: {e}")
+            return {}
+        finally:
+            self.put_connection(conn)

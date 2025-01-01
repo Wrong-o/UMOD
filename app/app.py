@@ -238,7 +238,7 @@ async def api_call(request: Request, api_request: APIRequest):
     It logs all responses using db_manager.
     Logs along the way to help debugging 
     """
-    logger.info("An api call was made")
+    logger.info("An api call initiated")
     try:
         user_input = api_request.text
         question_language = detect(user_input)
@@ -246,9 +246,12 @@ async def api_call(request: Request, api_request: APIRequest):
 
         try:
             db_result = db_manager.fetch_manual(route_name)
-            manual = db_result[0]["manual"]  
+            manual = db_result[0]["manual"]
         except ConnectionError as e:
             logger.error(f"Error fetching context: {e}")
+
+        #avalible_images = db_manager.get_images(route_name)
+
 
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
@@ -411,6 +414,88 @@ async def log_frontend_error(error_log: FrontendErrorLog):
         return {"status": "error logging failed"}, 500
 
 
+
+
+@app.post("/self_upload_api")
+async def self_upload_api_call(request: Request, api_request: APIRequest, user_uploaded_manual: str):
+    """
+    WIP
+    Returns information in JSON format
+    This user sends all messages from the session to the API and returns the api response.
+    It logs all responses using db_manager.
+    Logs along the way to help debugging 
+    """
+    logger.info("An api call initiated")
+    try:
+        user_input = api_request.text
+        try:
+            manual = user_uploaded_manual
+            
+        except ConnectionError as e:
+            logger.error(f"Error fetching context: {e}")
+
+        
+
+        if 'chat_id' not in request.session:
+            request.session['chat_id'] = str(uuid4())
+        logger.info(f"The chat_id was added : {request.session['chat_id']}")
+        try:
+            if "messages" not in request.session:
+                request.session["messages"] = [
+                    {
+                        "role": "user",
+                        "content": user_input
+                    }
+                ]
+            else:
+                request.session['messages'].append({
+                    "role": "user",
+                    "content": user_input
+                })
+        except Exception as e:
+            logger.error(f"Error when adding messages to session history: {e}")
+
+        #API call, starting with manual content
+        messages = [{"role": "system", "content": manual + "Short and to the point"}]
+        messages.extend(request.session['messages'])
+        logger.info("messages are working")
+        # call to OpenAI with the conversation history
+        try: 
+            logger.info("Making the call")
+            chat_completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages
+        )
+            logger.info("call succesfull")
+        except Exception as e:
+            logger.error(f"api called failed: {e}")
+
+        #Generate unique ID 
+        assistant_message_id = str(uuid4())
+
+        response = chat_completion.choices[0].message.content
+        logger.info(chat_completion)
+        logger.info(f"The following reponse was gotten from the api: {response}")
+
+        #Append response to history
+        request.session['messages'].append({
+            "role": "assistant",
+            "content": response,
+            "message_id": assistant_message_id
+        })
+        return JSONResponse(content={
+            "response": response, 
+            "response_id": assistant_message_id
+            })
+    
+    
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=500
+        )
+    
 
 
 if __name__ == "__main__":
