@@ -167,6 +167,15 @@ async def landing_page(request: Request):
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
+@app.get("/upload", response_class=HTMLResponse)
+async def upload(request: Request):
+    """
+    Go to custom upload page
+    """
+    logger.info("Upload page accessed")
+    return HTMLResponse("<h1>Upload Page</h1>")
+    #return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
+
 
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str):
@@ -204,14 +213,6 @@ async def product_page(request: Request, product_name: str):
         "context": manual
     })
 
-@app.get("/upload", response_class=HTMLResponse)
-async def upload(request: Request):
-    """
-    Go to custom upload page
-    """
-    logger.info("Upload page accessed")
-    return HTMLResponse("<h1>Upload Page</h1>")
-    #return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
