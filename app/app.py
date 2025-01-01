@@ -210,8 +210,8 @@ async def upload(request: Request):
     Go to custom upload page
     """
     logger.info("Upload page accessed")
-
-    return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
+    return HTMLResponse("<h1>Upload Page</h1>")
+    #return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
