@@ -204,14 +204,14 @@ async def product_page(request: Request, product_name: str):
         "context": manual
     })
 
-
 @app.get("/upload", response_class=HTMLResponse)
 async def upload(request: Request):
     """
     Go to custom upload page
     """
-    return templates.TemplateResponse('upload.html', {"request": request, "title": "upload"})
+    logger.info("Upload page accessed")
 
+    return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
