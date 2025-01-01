@@ -173,9 +173,10 @@ async def upload(request: Request):
     Go to custom upload page
     """
     logger.info("Upload page accessed")
-    return HTMLResponse("<h1>Upload Page</h1>")
-    #return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
+    return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
 
+
+#All other endpoints needs to be above this one!!!
 
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str):
