@@ -167,6 +167,16 @@ async def landing_page(request: Request):
     return templates.TemplateResponse('landing.html', {"request": request, "products": product_list})
 
 
+@app.get("/upload", response_class=HTMLResponse)
+async def upload(request: Request):
+    """
+    Go to custom upload page
+    """
+    logger.info("Upload page accessed")
+    return templates.TemplateResponse('upload.html', {"request": request, "title": "Upload"})
+
+
+#All other endpoints needs to be above this one!!!
 
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str):
