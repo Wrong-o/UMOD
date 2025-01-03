@@ -61,7 +61,7 @@ class DatabaseManager:
                 
             return result
         except Exception as e:
-            raise ConnectionError(f"db_manager.fetch_manual: manual not found: {e}")
+            raise ConnectionError(f"db_manager: manual not found: {e}")
         
         finally:
             self.put_connection(conn)
