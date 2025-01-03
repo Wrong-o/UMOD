@@ -101,6 +101,14 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
+def get_manual_by_product_name(product: str) -> str:
+    try:
+        db_result = db_manager.fetch_manual(product)
+        manual = db_result[0]["manual"]
+        return manual
+    except Exception as e:
+        logger.error(f"Error getting manual {e}")
+
 @app.middleware("http")
 async def log_requests(request, call_next):
     response = await call_next(request)
@@ -254,14 +262,8 @@ async def api_call(request: Request, api_request: APIRequest):
         question_language = detect(user_input)
         route_name = request.headers.get("referer", "").split('/')[-1]
 
-        try:
-            db_result = db_manager.fetch_manual(route_name)
-            manual = db_result[0]["manual"]
-        except ConnectionError as e:
-            logger.error(f"Error fetching context: {e}")
-
+        manual = get_manual_by_product_name(route_name)
         #avalible_images = db_manager.get_images(route_name)
-
 
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
