@@ -403,6 +403,27 @@
         
 
     <script>
+        console.log = (message) => sendLog("info", message);
+        console.warn = (message) => sendLog("warning", message);
+        console.error = (message) => sendLog("error", message);
+
+        async function sendLog(level, message) {
+            try {
+                const response = await fetch('/frontend-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ level, message }),
+                });
+
+                if (!response.ok) {
+                    console.error("Failed to send log:", await response.text());
+                }
+            } catch (error) {
+                console.error("Error sending log:", error);
+            }
+        }
+
+
         // Utility function for delay
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -481,7 +502,7 @@
     async function typeMessage(response, responseId) {
     const wrapper = document.createElement('div');
     wrapper.classList.add('message-wrapper');
-
+    
     // Store the response_id as a data attribute
     wrapper.dataset.responseId = responseId;
 
@@ -499,7 +520,7 @@
     thumbsUp.classList.add('feedback-button');
     thumbsUp.innerHTML = '👍';
     thumbsUp.style.fontSize = '16px';
-    thumbsUp.onclick = function () {
+    thumbsUp.onclick = function() {
         handleFeedback(this, true);
     };
 
@@ -507,7 +528,7 @@
     thumbsDown.classList.add('feedback-button');
     thumbsDown.innerHTML = '👎';
     thumbsDown.style.fontSize = '16px';
-    thumbsDown.onclick = function () {
+    thumbsDown.onclick = function() {
         handleFeedback(this, false);
     };
 
@@ -535,7 +556,10 @@
 
     const typingSpeed = 10;
     let currentText = '';
-    const decodedText = decodeHtmlEntities(response.text || '');
+    
+    // Use response.response if it exists, otherwise use response.text
+    const messageText = response.response || response.text;
+    const decodedText = decodeHtmlEntities(messageText || '');
 
     // Type the text response
     for (let i = 0; i < decodedText.length; i++) {
@@ -731,51 +755,58 @@
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-        async function sendMessage() {
+        
+async function sendMessage() {
     const input = document.getElementById('userInput');
     const text = input.value.trim();
 
-    if (text !== '') {
-        createUserMessage(text);
-        input.value = '';
-    
-        const thinkingWrapper = document.createElement('div');
-        thinkingWrapper.classList.add('message-wrapper');
-    
-        const thinkingIndicator = document.createElement('div');
-        thinkingIndicator.classList.add('thinking-indicator');
-        thinkingIndicator.textContent = 'Reading manual...';
-    
-        thinkingWrapper.appendChild(thinkingIndicator);
-    
-        const chatContainer = document.getElementById('chatContainer');
-        chatContainer.appendChild(thinkingWrapper);
-        scrollToBottom();
-    
-        try {
-            const response = await fetch('/api', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text }),
-            });
+    if (text === '') return;
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            thinkingWrapper.remove();
+    createUserMessage(text);
+    input.value = '';
 
-            if (data.error) {
-                await typeMessage({ text: 'Sorry, there was an error processing your message.' }, null);
-                console.error('API Error:', data.error);
-            } else {
-                await typeMessage(data, data.response_id);
-            }
-        } catch (error) {
-            thinkingWrapper.remove();
-            await typeMessage({ text: 'Sorry, there was an error processing your message.' }, null);
-            console.error('Fetch Error:', error);
+    const thinkingWrapper = document.createElement('div');
+    thinkingWrapper.classList.add('message-wrapper');
+
+    const thinkingIndicator = document.createElement('div');
+    thinkingIndicator.classList.add('thinking-indicator');
+    thinkingIndicator.textContent = 'Reading manual...';
+
+    thinkingWrapper.appendChild(thinkingIndicator);
+
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.appendChild(thinkingWrapper);
+    scrollToBottom();
+
+    try {
+        const response = await fetch('/api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+        });
+
+        sendLog("info", `Raw Response: status=${response.status}, statusText=${response.statusText}`);
+
+        const data = await response.json();
+        sendLog("info", `Parsed response: ${JSON.stringify(data)}`);
+
+        thinkingWrapper.remove();
+
+        if (data.error) {
+            sendLog("error", `API Error: ${data.error}`);
+            await typeMessage({ 
+                response: 'Sorry, there was an error processing your message.' 
+            }, null);
+        } else {
+            sendLog("info", `Successfully processed response: ${JSON.stringify(data)}`);
+            await typeMessage(data, data.response_id);
         }
+    } catch (error) {
+        sendLog("error", `Fetch Error: ${error.message}`);
+        thinkingWrapper.remove();
+        await typeMessage({ 
+            response: 'Sorry, there was an error processing your message.' 
+        }, null);
     }
 }
         

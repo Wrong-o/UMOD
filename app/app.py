@@ -101,6 +101,18 @@ class FeedbackRequest(BaseModel):
 class APIRequest(BaseModel):
     text: str
 
+def get_manual_by_product_name(product: str) -> str:
+    try:
+        db_result = db_manager.fetch_manual(product)
+        manual = db_result[0]["manual"]
+        return manual
+    except Exception as e:
+        logger.error(f"Error getting manual {e}")
+
+def get_images_by_product_name(product: str) -> dict:
+    image_dict = db_manager.get_images(product)
+
+
 @app.middleware("http")
 async def log_requests(request, call_next):
     response = await call_next(request)
@@ -254,14 +266,8 @@ async def api_call(request: Request, api_request: APIRequest):
         question_language = detect(user_input)
         route_name = request.headers.get("referer", "").split('/')[-1]
 
-        try:
-            db_result = db_manager.fetch_manual(route_name)
-            manual = db_result[0]["manual"]
-        except ConnectionError as e:
-            logger.error(f"Error fetching context: {e}")
-
+        manual = get_manual_by_product_name(route_name)
         #avalible_images = db_manager.get_images(route_name)
-
 
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
@@ -346,7 +352,7 @@ async def api_call(request: Request, api_request: APIRequest):
         except Exception as e:
             raise Exception(f"{e}")
         try:
-            logger.info(json.dumps({"response": response, "response_id": assistant_message_id}))
+            logger.info(f"Response being sent: {response}")
             return JSONResponse(content={
                 "response": response, 
                 "response_id": assistant_message_id
@@ -396,6 +402,28 @@ class FrontendErrorLog(BaseModel):
     stack: Optional[str] = None
     response_id: str
 
+
+
+@app.post("/frontend-log")
+async def frontend_log(request: Request):
+    """
+    Endpoint to receive logs from the frontend and write them to the backend log.
+    """
+    data = await request.json()
+    log_level = data.get("level", "info").lower()  # Default to 'info' level
+    message = data.get("message", "No message provided")
+
+    # Log the message based on the level
+    if log_level == "info":
+        logger.info(f"Frontend: {message}")
+    elif log_level == "warning":
+        logger.warning(f"Frontend: {message}")
+    elif log_level == "error":
+        logger.error(f"Frontend: {message}")
+    else:
+        logger.debug(f"Frontend: {message}")
+
+    return {"status": "log received"}
 
 @app.post("/log_frontend_error")
 async def log_frontend_error(error_log: FrontendErrorLog):

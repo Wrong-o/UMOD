@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .  # Dockerfile is in the root of the project
+    ports:
+      - "8000:8000"  # Map container port 8000 to host port 8000
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
+      - ENV_FILE_LOCATION=.env  # Load environment variables
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    depends_on:
+      - db  # Start the database service first
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5433:5432"  # Expose the database on port 5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
