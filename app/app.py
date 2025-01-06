@@ -271,7 +271,6 @@ async def api_call(request: Request, api_request: APIRequest):
 
         if 'chat_id' not in request.session:
             request.session['chat_id'] = str(uuid4())
-        logger.info(f"The chat_id was added : {request.session['chat_id']}")
         try:
             if "messages" not in request.session:
                 request.session["messages"] = [
@@ -291,7 +290,6 @@ async def api_call(request: Request, api_request: APIRequest):
         #API call, starting with manual content
         messages = [{"role": "system", "content": manual + "Short and to the point"}]
         messages.extend(request.session['messages'])
-        logger.info("messages are working")
         # call to OpenAI with the conversation history
         try: 
             logger.info("Making the call")
@@ -307,8 +305,6 @@ async def api_call(request: Request, api_request: APIRequest):
         assistant_message_id = str(uuid4())
 
         response = chat_completion.choices[0].message.content
-        logger.info(chat_completion)
-        logger.info(f"The following reponse was gotten from the api: {response}")
         response_language = detect(response)
 
         #Append response to history
@@ -345,14 +341,11 @@ async def api_call(request: Request, api_request: APIRequest):
 
             )
             db_manager.log_question(log_query) 
-            logger.info("The question was sent to the log")
-            logger.info(f"{response} is respones")
             response = response.replace("\ue61f", "&trade;")
             logger.info(f"Formatted API response: \n {response}")
         except Exception as e:
             raise Exception(f"{e}")
         try:
-            logger.info(f"Response being sent: {response}")
             return JSONResponse(content={
                 "response": response, 
                 "response_id": assistant_message_id
