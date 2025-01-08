@@ -63,11 +63,11 @@
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
                 <img src="umodlogga.png" alt="UMOD Logo" class="w-48 mx-auto mb-6">
-                <h2 class="text-3xl font-bold gradientText mb-2">Logga in</h2>
-                <p class="text-gray-400">Välkommen tillbaka till UMOD</p>
+                <h2 class="text-3xl font-bold gradientText mb-2">Registrera konto</h2>
+                <p class="text-gray-400">Skapa ditt UMOD-konto för att komma igång</p>
             </div>
 
-            <form method="POST" action="/login" class="space-y-6">
+            <form method="POST" action="/register" class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">E-post</label>
                     <input type="email" name="email" required
@@ -80,6 +80,12 @@
                         class="w-full px-4 py-3 rounded-lg">
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Bekräfta lösenord</label>
+                    <input type="password" name="confirm-password" required
+                        class="w-full px-4 py-3 rounded-lg">
+                </div>
+
                 {% if error %}
                     <div class="text-red-400 text-sm">{{ error }}</div>
                 {% endif %}
@@ -87,14 +93,14 @@
                 <button type="submit" 
                     class="w-full bg-white bg-opacity-10 hover:bg-opacity-20 border border-white border-opacity-10 
                     hover:border-opacity-20 px-6 py-3 rounded-lg text-lg transition-all transform hover:-translate-y-0.5">
-                    Logga in
+                    Registrera
                 </button>
             </form>
 
             <div class="mt-6 text-center">
-                <a href="/register" 
+                <a href="/login" 
                     class="text-gray-400 hover:text-white transition-colors">
-                    Inget konto än? Registrera dig här
+                    Har du redan ett konto? Logga in här
                 </a>
             </div>
         </div>
