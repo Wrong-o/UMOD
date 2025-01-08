@@ -156,6 +156,16 @@ async def login_post(request: Request, username: str = Form(...), password: str 
         })
     """
    
+@app.get("/register", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
+async def login_get(request: Request):
+    """
+    Logs the page access and return the login templates
+    """
+    logger.info("Register page accessed")
+    return templates.TemplateResponse('regpage.html', {"request": request, "title": "register"})
+   
+
+
 
 @app.get("/home", response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def landing_page(request: Request):
