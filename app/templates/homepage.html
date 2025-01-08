@@ -33,23 +33,6 @@
             background-clip: text;
             color: transparent;
         }
-
-        input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            outline: none;
-        }
-
-        ::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
     </style>
 </head>
 <body class="bg-black text-white">
@@ -59,43 +42,30 @@
     <div class="glow top-1/4 right-1/4"></div>
 
     <!-- Huvudinnehåll -->
-    <div class="contentArea min-h-screen flex items-center justify-center px-4">
-        <div class="w-full max-w-md">
-            <div class="text-center mb-8">
-                <img src="umodlogga.png" alt="UMOD Logo" class="w-48 mx-auto mb-6">
-                <h2 class="text-3xl font-bold gradientText mb-2">Logga in</h2>
-                <p class="text-gray-400">Välkommen tillbaka till UMOD</p>
+    <div class="contentArea text-center py-10 px-4">
+        <img src="umodlogga.png" alt="UMOD Logo" class="w-96 mx-auto mb-10">
+        <h1 class="text-6xl font-bold mb-10 gradientText">User Manual On Demand</h1>
+        <p class="text-2xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Transformera din tekniska dokumentation till en intelligent chatbot som ger användarna exakt den information de behöver.
+        </p>
+        <a href="login.html">
+            <button class="bg-opacity-10 bg-white hover:bg-opacity-20 border border-white border-opacity-10 px-10 py-5 rounded-lg text-xl transition-all transform hover:-translate-y-0.5">
+                Testa UMOD här!
+            </button>
+        </a>
+        
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Naturlig Dialog</h3>
+                <p class="text-gray-400">Ge användarna svar i naturligt språk för en intuitiv upplevelse.</p>
             </div>
-
-            <form method="POST" action="/login" class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">E-post</label>
-                    <input type="email" name="email" required
-                        class="w-full px-4 py-3 rounded-lg">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Lösenord</label>
-                    <input type="password" name="password" required
-                        class="w-full px-4 py-3 rounded-lg">
-                </div>
-
-                {% if error %}
-                    <div class="text-red-400 text-sm">{{ error }}</div>
-                {% endif %}
-
-                <button type="submit" 
-                    class="w-full bg-white bg-opacity-10 hover:bg-opacity-20 border border-white border-opacity-10 
-                    hover:border-opacity-20 px-6 py-3 rounded-lg text-lg transition-all transform hover:-translate-y-0.5">
-                    Logga in
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <a href="/register" 
-                    class="text-gray-400 hover:text-white transition-colors">
-                    Inget konto än? Registrera dig här
-                </a>
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Automatiska Uppdateringar</h3>
+                <p class="text-gray-400">Håll dokumentationen aktuell med realtidsuppdateringar.</p>
+            </div>
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Kostnadseffektivt</h3>
+                <p class="text-gray-400">Eliminera kostnader för tryck och distribution.</p>
             </div>
         </div>
     </div>
