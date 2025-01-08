@@ -228,7 +228,7 @@ async def product_page(request: Request, product_name: str):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home():
+async def home(request: Request):
     """
     This function is called when root url is accessed
     """
