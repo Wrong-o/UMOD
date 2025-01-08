@@ -1,148 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Landing Page</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        }
+        
+        .mainGradient {
+            background: radial-gradient(circle at 50% -20%, #1a1a1a, #000000 70%);
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: -2;
         }
 
-        header {
-            background: linear-gradient(135deg, #2b2f3a 0%, #1a1d24 100%);
-            color: white;
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(64,64,64,0.2) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: -1;
         }
 
-        header h1 {
-            font-size: 1.8rem;
+        .contentArea {
+            position: relative;
+            z-index: 1;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .product-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .gradientText {
+            background: linear-gradient(to right bottom, #ffffff 30%, rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .product-item {
-            padding: 15px 20px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .product-item:hover {
-            background-color: #e9e9e9;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-        }
-
-        .product-item a {
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: 500;
-        }
-
-        .product-item a:hover {
-            text-decoration: underline;
-        }
-    
-        .cta-button {
-            margin: 20px auto;
-            text-align: center;
-        }
-
-        .cta-button a {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .cta-button a:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .cta-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        
-        .cta-container h2 {
-            margin-bottom: 20px;
-            color: #2b2f3a;
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Welcome to UMOD!</h1>
-        <p>Select a product to start chatting with the user manual</p>
-        <p>The manuals are added by the developers, click on the umod chat if you have quesitons.</p>
-    </header>
+<body class="bg-black text-white">
+    <!-- Bakgrundseffekter -->
+    <div class="mainGradient"></div>
+    <div class="glow top-0 left-1/4"></div>
+    <div class="glow top-1/4 right-1/4"></div>
 
-    <div class="cta-container">
-        <h2>Try UMOD with your own Manual!</h2>
-        <div class="cta-button">
-            <a href="/upload">Upload Here</a>
+    <!-- Huvudinnehåll -->
+    <div class="contentArea min-h-screen pb-20">
+        <!-- Header -->
+        <div class="text-center py-10 px-4">
+            <img src="umodlogga.png" alt="UMOD Logo" class="w-48 mx-auto mb-6">
+            <h1 class="text-4xl font-bold gradientText mb-4">Välkommen till UMOD!</h1>
+            <p class="text-gray-400 text-lg mb-2">Välj en produkt för att börja chatta med manualen</p>
+            <p class="text-gray-400">Manualerna är tillagda av utvecklarna, klicka på UMOD-chatten om du har frågor.</p>
         </div>
-    </div>
 
-    <div class="container">
-        <h2>Available Products</h2>
-        <div class="product-list">
-            {% for product in products %}
-            <div class="product-item">
-                <span>{{ product.display }}</span>
-                <a href="/{{ product.url }}">View Details</a>
+        <!-- Upload CTA Section -->
+        <div class="max-w-2xl mx-auto mb-10 bg-white bg-opacity-5 border border-white border-opacity-10 rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold gradientText mb-4">Testa UMOD med din egen manual!</h2>
+            <a href="/upload" 
+                class="inline-block bg-white bg-opacity-10 hover:bg-opacity-20 border border-white border-opacity-10 
+                hover:border-opacity-20 px-8 py-3 rounded-lg text-lg transition-all transform hover:-translate-y-0.5">
+                Ladda upp här
+            </a>
+        </div>
+
+        <!-- Products Section -->
+        <div class="max-w-2xl mx-auto bg-white bg-opacity-5 border border-white border-opacity-10 rounded-xl p-8">
+            <h2 class="text-2xl font-bold gradientText mb-6">Tillgängliga produkter</h2>
+            <div class="space-y-4">
+                {% for product in products %}
+                <div class="product-item flex justify-between items-center p-4 rounded-lg">
+                    <span class="text-gray-200">{{ product.display }}</span>
+                    <a href="/{{ product.url }}" 
+                        class="text-blue-400 hover:text-blue-300 transition-colors">
+                        Visa detaljer
+                    </a>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
-        
-        
     </div>
 </body>
 </html>
