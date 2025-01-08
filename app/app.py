@@ -232,7 +232,7 @@ async def home():
     """
     This function is called when root url is accessed
     """
-    return RedirectResponse(url="/login")
+    return templates.TemplateResponse('homepage.html', {"request": request, "title": "homepage"})
 
 
 @app.post("/clear_session")

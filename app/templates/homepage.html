@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .mainGradient {
+            background: radial-gradient(circle at 50% -20%, #1a1a1a, #000000 70%);
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: -2;
+        }
+
+        .glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(64,64,64,0.2) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .contentArea {
+            position: relative;
+            z-index: 1;
+        }
+
+        .gradientText {
+            background: linear-gradient(to right bottom, #ffffff 30%, rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Bakgrundseffekter -->
+    <div class="mainGradient"></div>
+    <div class="glow top-0 left-1/4"></div>
+    <div class="glow top-1/4 right-1/4"></div>
+
+    <!-- Huvudinnehåll -->
+    <div class="contentArea text-center py-10 px-4">
+        <img src="umodlogga.png" alt="UMOD Logo" class="w-96 mx-auto mb-10">
+        <h1 class="text-6xl font-bold mb-10 gradientText">User Manual On Demand</h1>
+        <p class="text-2xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Transformera din tekniska dokumentation till en intelligent chatbot som ger användarna exakt den information de behöver.
+        </p>
+        <button class="bg-opacity-10 bg-white hover:bg-opacity-20 border border-white border-opacity-10 px-10 py-5 rounded-lg text-xl transition-all transform hover:-translate-y-0.5">
+            Testa UMOD här!
+        </button>
+        
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Naturlig Dialog</h3>
+                <p class="text-gray-400">Ge användarna svar i naturligt språk för en intuitiv upplevelse.</p>
+            </div>
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Automatiska Uppdateringar</h3>
+                <p class="text-gray-400">Håll dokumentationen aktuell med realtidsuppdateringar.</p>
+            </div>
+            <div class="h-64 bg-white bg-opacity-5 border border-white border-opacity-5 p-8 rounded-xl hover:border-opacity-10 transition-all transform hover:-translate-y-1">
+                <h3 class="text-2xl font-semibold mb-4 gradientText">Kostnadseffektivt</h3>
+                <p class="text-gray-400">Eliminera kostnader för tryck och distribution.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
