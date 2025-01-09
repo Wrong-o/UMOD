@@ -326,32 +326,51 @@
                 }
             });
         </script>
-        <script>const logFrontendError = async (error) => {
-            try {
-                const response = await fetch('/log_frontend_error', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: error.message || 'Unknown error',
-                        url: window.location.href, // Current page URL
-                        type: error.type || 'Error',
-                        timestamp: new Date().toISOString(),
-                        stack: error.stack || null, // Stack trace if available
-                        
-                    }),
-                });
-        
-                if (!response.ok) {
-                    console.error("Failed to log frontend error:", response.statusText);
-                } else {
-                    console.log("Frontend error logged successfully.");
-                }
-            } catch (err) {
-                console.error("Error while sending frontend log:", err);
+<script>
+    const logFrontendError = async (error) => {
+        try {
+            const response = await fetch('/frontend-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: error.message || 'Unknown error',
+                    url: window.location.href, // Current page URL
+                    type: error.type || 'Error',
+                    timestamp: new Date().toISOString(),
+                    stack: error.stack || null, // Stack trace if available
+                }),
+            });
+
+            if (!response.ok) {
+                console.error("Failed to log frontend error:", response.statusText);
+            } else {
+                console.log("Frontend error logged successfully.");
             }
-        };</script>
+        } catch (err) {
+            console.error("Error while sending frontend log:", err);
+        }
+    };
+
+    // Capture uncaught JavaScript errors
+    window.onerror = (message, source, lineno, colno, error) => {
+        logFrontendError({
+            message: message,
+            type: 'UncaughtError',
+            stack: error ? error.stack : `At ${source}:${lineno}:${colno}`,
+        });
+    };
+
+    // Capture unhandled promise rejections
+    window.addEventListener('unhandledrejection', (event) => {
+        logFrontendError({
+            message: event.reason ? event.reason.message : 'Unhandled rejection',
+            type: 'PromiseRejection',
+            stack: event.reason ? event.reason.stack : null,
+        });
+    });
+</script>
 
     <header>
         <div class="header-content">
@@ -760,27 +779,15 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
-async function sendMessage() {
+        async function sendMessage() {
     const input = document.getElementById('userInput');
     const text = input.value.trim();
 
     if (text === '') return;
 
+    console.log("Sending message:", text); // Add this to debug
     createUserMessage(text);
     input.value = '';
-
-    const thinkingWrapper = document.createElement('div');
-    thinkingWrapper.classList.add('message-wrapper');
-
-    const thinkingIndicator = document.createElement('div');
-    thinkingIndicator.classList.add('thinking-indicator');
-    thinkingIndicator.textContent = 'Reading manual...';
-
-    thinkingWrapper.appendChild(thinkingIndicator);
-
-    const chatContainer = document.getElementById('chatContainer');
-    chatContainer.appendChild(thinkingWrapper);
-    scrollToBottom();
 
     try {
         const response = await fetch('/api', {
@@ -789,28 +796,19 @@ async function sendMessage() {
             body: JSON.stringify({ text }),
         });
 
-        sendLog("info", `Raw Response: status=${response.status}, statusText=${response.statusText}`);
+        console.log("Response received:", response.status, response.statusText);
 
         const data = await response.json();
-        sendLog("info", `Parsed response: ${JSON.stringify(data)}`);
-
-        thinkingWrapper.remove();
+        console.log("Response data:", data);
 
         if (data.error) {
-            sendLog("error", `API Error: ${data.error}`);
-            await typeMessage({ 
-                response: 'Sorry, there was an error processing your message.' 
-            }, null);
+            await typeMessage({ response: 'Error: ' + data.error }, null);
         } else {
-            sendLog("info", `Successfully processed response: ${JSON.stringify(data)}`);
             await typeMessage(data, data.response_id);
         }
     } catch (error) {
-        sendLog("error", `Fetch Error: ${error.message}`);
-        thinkingWrapper.remove();
-        await typeMessage({ 
-            response: 'Sorry, there was an error processing your message.' 
-        }, null);
+        console.error("Error during API call:", error);
+        await typeMessage({ response: 'Sorry, there was an error processing your message.' }, null);
     }
 }
         
