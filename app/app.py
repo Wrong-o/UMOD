@@ -127,10 +127,10 @@ def login(
         )
     return RedirectResponse(url="/home", status_code=302)
     
-@app.get("/tables")
-async def get_tables(db: Session = Depends(get_db)):
-    tables = list_all_tables(db)
-    return {"available_tables": tables}
+# @app.get("/tables")
+# async def get_tables(db: Session = Depends(get_db)):
+#     tables = list_all_tables(db)
+#     return {"available_tables": tables}
 
 @app.get("/home", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
