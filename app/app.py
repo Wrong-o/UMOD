@@ -166,6 +166,10 @@ async def product_page(request: Request, product_name: str, db: Session = Depend
         "index.html", 
         {"request": request, "title": product_name.capitalize(), "context": manual_content}
     )
+
+@app.get("/register")
+async def register_get(request: Request):
+    return templates.TemplateResponse("regpage.html", {"request": request, "title": "Register"})
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest, db: Session = Depends(get_db)):
     try:
@@ -295,6 +299,7 @@ async def frontend_log(request: Request):
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return RedirectResponse(url="/login")
+
 
 if __name__ == "__main__":
     import uvicorn
