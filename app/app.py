@@ -6,7 +6,6 @@ from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, select
-#from app.database_manager import DatabaseManager
 from app.models import QuestionLog, Product
 from datetime import datetime
 from openai import OpenAI
@@ -44,10 +43,6 @@ static_directory = "/app/app/static"
 app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 templates = Jinja2Templates(directory=templates_directory)
-
-# Database setup
-db_url = os.getenv("DATABASE_URL")
-engine = create_engine(db_url)
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # Validate environment variables
