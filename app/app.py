@@ -149,6 +149,13 @@ async def upload(request: Request):
     logger.info("Upload page accessed")
     return templates.TemplateResponse("upload.html", {"request": request, "title": "Upload"})
 
+@app.get("/register")
+async def register_get(request: Request):
+    return templates.TemplateResponse("regpage.html", {"request": request, "title": "Register"})
+
+
+###Den här måste vara under andra endpoints
+
 @app.get("/{product_name}", response_class=HTMLResponse)
 async def product_page(request: Request, product_name: str, db: Session = Depends(get_db)):
     # Query the product by name
@@ -167,9 +174,7 @@ async def product_page(request: Request, product_name: str, db: Session = Depend
         {"request": request, "title": product_name.capitalize(), "context": manual_content}
     )
 
-@app.get("/register")
-async def register_get(request: Request):
-    return templates.TemplateResponse("regpage.html", {"request": request, "title": "Register"})
+
 @app.post("/api")
 async def api_call(request: Request, api_request: APIRequest, db: Session = Depends(get_db)):
     try:
