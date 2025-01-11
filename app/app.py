@@ -37,12 +37,11 @@ app = FastAPI()
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "supersecretkey"))
 
-# Set up Jinja2 Templates
-templates_directory = "/app/app/templates"
-static_directory = "/app/app/static"
-app.mount("/templates", StaticFiles(directory=templates_directory), name="templates")
-app.mount("/static", StaticFiles(directory=static_directory), name="static")
-templates = Jinja2Templates(directory=templates_directory)
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Set templates directory
+templates = Jinja2Templates(directory="app/templates")
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 # Validate environment variables
@@ -88,14 +87,6 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Request path: {request.url.path}, Status code: {response.status_code}")
     return response
 
-# Routes
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    favicon_path = os.path.join(static_directory, "favicon.ico")
-    if os.path.exists(favicon_path):
-        return FileResponse(favicon_path)
-    return FileResponse("./static/favicon.ico")
-
 @app.get("/test_user_table")
 def test_user_table(db: Session = Depends(get_db)):
     users = db.query(User).all()
@@ -103,7 +94,6 @@ def test_user_table(db: Session = Depends(get_db)):
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_get(request: Request):
-    logger.info("Login page accessed")
     return templates.TemplateResponse("login.html", {"request": request, "title": "Login"})
 
 @app.post("/login")
@@ -153,6 +143,13 @@ async def upload(request: Request):
 async def register_get(request: Request):
     return templates.TemplateResponse("regpage.html", {"request": request, "title": "Register"})
 
+@app.post("/register")
+async def register_post(request: Request, email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    try:
+        create_user(email, password, db)
+        return RedirectResponse(url="/login", status_code=302)
+    except IntegrityError:
+        return RedirectResponse(url="/register", status_code=302)
 
 ###Den här måste vara under andra endpoints
 

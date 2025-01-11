@@ -3,52 +3,14 @@
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
+        html, body {
+            height: 100%;
+            overflow: auto;
         }
-        
-        .mainGradient {
-            background: radial-gradient(circle at 50% -20%, #1a1a1a, #000000 70%);
-            min-height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: -2;
-        }
-
-        .glow {
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(64,64,64,0.2) 0%, rgba(0,0,0,0) 70%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
         .contentArea {
-            position: relative;
-            z-index: 1;
-        }
-
-        .gradientText {
-            background: linear-gradient(to right bottom, #ffffff 30%, rgba(255,255,255,0.7));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .product-item {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .product-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            min-height: 100vh;
         }
     </style>
 </head>
@@ -61,8 +23,8 @@
     <!-- Huvudinnehåll -->
     <div class="contentArea min-h-screen pb-20">
         <!-- Header -->
+        <img src="{{ url_for('static', path='images/banner.png') }}" alt="Logo">
         <div class="text-center py-10 px-4">
-            <img src="umodlogga.png" alt="UMOD Logo" class="w-48 mx-auto mb-6">
             <h1 class="text-4xl font-bold gradientText mb-4">Välkommen till UMOD!</h1>
             <p class="text-gray-400 text-lg mb-2">Välj en produkt för att börja chatta med manualen</p>
             <p class="text-gray-400">Manualerna är tillagda av utvecklarna, klicka på UMOD-chatten om du har frågor.</p>
