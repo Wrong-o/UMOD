@@ -44,8 +44,6 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-# Validate environment variables
-
 
 # Define request models
 class FeedbackRequest(BaseModel):
@@ -79,6 +77,17 @@ def verify_user_login(email: str, password: str, db: Session) -> bool:
         return True
     return False
 
+# Check if the user is authenticated
+def is_authenticated(request: Request):
+    auth_status = request.session.get("is_authenticated", False)
+    logger.info(f"User authenticated: {auth_status}")
+    return auth_status
+
+def require_login(request: Request):
+    if not request.session.get("is_authenticated"):
+        # Redirect to login page if user is not authenticated
+        return RedirectResponse(url="/login", status_code=303)
+
 
 # Middleware for logging requests
 @app.middleware("http")
@@ -94,6 +103,8 @@ def test_user_table(db: Session = Depends(get_db)):
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_get(request: Request):
+    if is_authenticated(request):
+        return RedirectResponse(url="/home", status_code=303)
     return templates.TemplateResponse("login.html", {"request": request, "title": "Login"})
 
 @app.post("/login")
@@ -110,6 +121,7 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+    request.session["is_authenticated"] = True
     return RedirectResponse(url="/home", status_code=302)
     
 # @app.get("/tables")
@@ -117,7 +129,7 @@ def login(
 #     tables = list_all_tables(db)
 #     return {"available_tables": tables}
 
-@app.get("/home", response_class=HTMLResponse)
+@app.get("/home", response_class=HTMLResponse, dependencies=[Depends(require_login)])
 async def home(request: Request, db: Session = Depends(get_db)):
     # Query all products from the product_table
     products = db.query(Product).all()

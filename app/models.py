@@ -55,3 +55,5 @@ class QuestionLog(Base):
     q_lang = Column(String, nullable=False)
     r_lang = Column(String, nullable=False)
     response_id = Column(String, nullable=False)
+
+
