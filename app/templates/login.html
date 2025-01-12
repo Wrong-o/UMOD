@@ -2,55 +2,7 @@
 <html>
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <style>
-        .mainGradient {
-            background: radial-gradient(circle at 50% -20%, #1a1a1a, #000000 70%);
-            min-height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: -2;
-        }
-
-        .glow {
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(64,64,64,0.2) 0%, rgba(0,0,0,0) 70%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .contentArea {
-            position: relative;
-            z-index: 1;
-        }
-
-        .gradientText {
-            background: linear-gradient(to right bottom, #ffffff 30%, rgba(255,255,255,0.7));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            outline: none;
-        }
-
-        ::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
 </head>
 <body class="bg-black text-white">
     <!-- Bakgrundseffekter -->
@@ -62,7 +14,7 @@
     <div class="contentArea min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-md">
             <div class="text-center mb-8">
-                <img src="umodlogga.png" alt="UMOD Logo" class="w-48 mx-auto mb-6">
+                <img src="{{ url_for('static', path='images/banner.png') }}" alt="Logo">
                 <h2 class="text-3xl font-bold gradientText mb-2">Logga in</h2>
                 <p class="text-gray-400">Välkommen tillbaka till UMOD</p>
             </div>
