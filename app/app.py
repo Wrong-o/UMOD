@@ -38,7 +38,7 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "supersecretkey"))
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="app/app/static"), name="static")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Set templates directory
 templates = Jinja2Templates(directory="app/templates")
