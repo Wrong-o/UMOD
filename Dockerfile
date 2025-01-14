@@ -8,8 +8,14 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Create static directory and set permissions
+RUN mkdir -p /app/app/static && chmod -R 755 /app/app/static
+
 # Copy the entire project directory to the container
 COPY . .
+
+# Ensure static files have proper permissions
+RUN chmod -R 755 /app/app/static
 
 # Expose the port your app runs on
 EXPOSE 8000

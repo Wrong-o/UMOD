@@ -36,9 +36,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "supersecretkey"))
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+print(f"Static directory path: {static_dir}")
+print(f"Static directory contents: {os.listdir(static_dir)}")
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="/static"), name="static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Set templates directory
 templates = Jinja2Templates(directory="app/templates")
