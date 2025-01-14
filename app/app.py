@@ -38,7 +38,7 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY", "supersecretkey"))
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 logger.info(f"Static directory path: {static_dir}")
-logger.info(f"Static directory contents: {os.listdir(static_dir)}")
+logger.info(f"Static directory contents: {os.listdir(static_dir)}/css/")
 
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
