@@ -229,7 +229,7 @@ async def api_call(request: Request, api_request: APIRequest, db: Session = Depe
         try: 
             logger.info("Making the call")
             chat_completion = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=messages
             )
             logger.info("call successful")
