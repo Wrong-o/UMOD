@@ -1,4 +1,4 @@
-# 📘 ManualBot
+# 📘 UserManualOnDemand (UMOD)
 
 **A chatbot web app that reads and understands user manuals using custom context.**
 
