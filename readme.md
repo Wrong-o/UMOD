@@ -2,7 +2,7 @@
 
 **A chatbot web app that reads and understands user manuals using custom context.**
 
-ManualBot helps users get instant, accurate answers from complex manuals without needing to read through everything themselves.
+UserManualOnDemand helps users get instant, accurate answers from complex manuals without needing to read through everything themselves.
 
 ---
 
